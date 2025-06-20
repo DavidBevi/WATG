@@ -1,11 +1,11 @@
-# WATG: Whatsapp+Telegram<sub><sup> — written in Tauri for Windows</sup></sub>
+# WATG: Whatsapp+Telegram<sub><sup> — A Tauri app for Windows (I'm unable to make it cross-platform 😢)</sup></sub>
 
 > [!WARNING]  
 > This is just a backup of my dev build, it's not ready for production.
 
 <br/><br/>
 
-## How to use it <sub><sup> → mainly for myself in the future, I tend to forget</sup></sub>
+## How to use it <sub><sup> → Mainly for myself, I tend to forget → If you dare to try it good luck, and gimme feedback! 😊</sup></sub>
 
 <details>
   <summary>Installation instructions</summary>
@@ -29,7 +29,7 @@ To cycle betwheen Whatsapp and Telegram click on the tray icon
 
 <br/><br/>
 
-## Planned features <sub><sup> → hopefully</sup></sub>
+## Planned features <sub><sup> → Hopefully 🤞</sup></sub>
 
 - make zoom adjustable and persistent
 - make WATG closable-in-tray
