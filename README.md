@@ -11,10 +11,10 @@
   <summary>Installation instructions</summary>
   <br/>
 
-  1. install prerequisites:
+1. install prerequisites:
+   - `visual studio build tools 2022 (v17.14.6+36212.18.-june.2025-) ` > `MSVC compiler (v143)`
    - `rustc 1.87.0 (17067e9ac 2025-05-09)`
    - `tauri-cli 2.5.0`
-   - `VisualStudio/17.14.6+36212.18.-june.2025-`
 2. download [main.zip](https://github.com/DavidBevi/WATG/archive/refs/heads/main.zip) and unzip it in a folder
    - (example: `C:\watg`)
 3. open a `cmd` in that folder and use these commands:
