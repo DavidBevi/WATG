@@ -25,12 +25,11 @@
 
 </details>
    
-To cycle betwheen Whatsapp and Telegram click on the tray icon
+To cycle betwheen Whatsapp, Telegram, Hidden window click on the tray icon
 
 <br/><br/>
 
 ## Planned features <sub><sup> → Hopefully 🤞</sup></sub>
 
 - make zoom adjustable and persistent
-- make WATG closable-in-tray
-- make custom notifications
+- make custom notifications (probably impossible, AFAIK Tauri is designed NOT to allow this)
