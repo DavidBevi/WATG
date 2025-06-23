@@ -5,10 +5,10 @@
 
 <br/><br/>
 
-## How to use it <sub><sup> → Mainly for myself, I tend to forget → If you dare to try it good luck, and gimme feedback! 😊</sup></sub>
+## How to use/dev it <sub><sup> → Mainly for myself, I tend to forget → If you dare to try it good luck, and gimme feedback! 😊</sup></sub>
 
 <details>
-  <summary>Installation instructions</summary>
+  <summary>Install dependencies and run commands</summary>
   <br/>
 
 1. install prerequisites:
@@ -25,11 +25,12 @@
 
 </details>
    
-To cycle betwheen Whatsapp, Telegram, Hidden window click on the tray icon
+WATG window can show Whatsapp, show Telegram, be Hidden. To cycle through these states click on the tray icon.
 
 <br/><br/>
 
 ## Planned features <sub><sup> → Hopefully 🤞</sup></sub>
 
 - make zoom adjustable and persistent
-- make custom notifications (probably impossible, AFAIK Tauri is designed NOT to allow this)
+- make tray icon display unread count
+- make custom notifications
