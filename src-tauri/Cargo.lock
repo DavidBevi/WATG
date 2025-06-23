@@ -2023,7 +2023,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "my-watg"
+name = "watg"
 version = "0.1.0"
 dependencies = [
  "serde",
