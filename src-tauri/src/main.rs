@@ -1,8 +1,3 @@
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
-// use tauri::{LogicalPosition, LogicalSize, WebviewUrl, 
-//   tray::{TrayIconBuilder, TrayIconEvent}, 
-//   menu::{Menu, MenuItem},};
 use std::sync::Mutex;
 use tauri::{
   LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
@@ -12,9 +7,8 @@ use tauri::{
   webview::Webview,
 };
 
-//
 struct AppState {
-  flipped: Mutex<bool>,
+  state_index: Mutex<u8>, // 0: WA, 1: TG, 2: hidden
   webview1: Mutex<Option<Webview>>,
   webview2: Mutex<Option<Webview>>,
 }
@@ -22,7 +16,7 @@ struct AppState {
 fn main() {
   tauri::Builder::default()
     .manage(AppState {
-      flipped: Mutex::new(false),
+      state_index: Mutex::new(0),
       webview1: Mutex::new(None),
       webview2: Mutex::new(None),
     })
@@ -30,14 +24,11 @@ fn main() {
       let width = 725.;
       let height = 860.;
 
-      // Create menu items
       let switch_i = MenuItem::with_id(app, "switch", "Switch", true, None::<&str>)?;
       let menu = Menu::with_items(app, &[&switch_i])?;
 
-      // Tray icon (= app icon) + menu attachment
       let _tray = TrayIconBuilder::new()
         .icon(app.default_window_icon().unwrap().clone())
-        
         .on_tray_icon_event(|app, event| {
           match event {
             TrayIconEvent::Click {
@@ -48,12 +39,11 @@ fn main() {
             _ => println!("event not handled"),
           }
         })
-
         .menu(&menu)
         .menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id.as_ref() {
           "switch" => switch_view(app),
-          _ => { println!("menu item {:?} not handled", event.id); }
+          _ => println!("menu item {:?} not handled", event.id),
         })
         .build(app)?;
 
@@ -61,15 +51,15 @@ fn main() {
         .inner_size(width, height)
         .position(930., 10.)
         .build()?;
+      window.set_title("WATG").unwrap();
 
-      // Create webviews
       let wv1 = window.add_child(
         tauri::webview::WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
           .auto_resize(),
         LogicalPosition::new(0., 0.),
         LogicalSize::new(width, height),
       )?;
-      wv1.set_zoom(0.8)?;
+      wv1.set_zoom(0.75)?;
 
       let wv2 = window.add_child(
         tauri::webview::WebviewBuilder::new("TG", WebviewUrl::External("https://web.telegram.org".parse().unwrap()))
@@ -77,9 +67,8 @@ fn main() {
         LogicalPosition::new(width, 0.),
         LogicalSize::new(0., height),
       )?;
-      wv2.set_zoom(0.8)?;
+      wv2.set_zoom(0.75)?;
 
-      // Save webviews in state
       let state = app.state::<AppState>();
       *state.webview1.lock().unwrap() = Some(wv1);
       *state.webview2.lock().unwrap() = Some(wv2);
@@ -90,19 +79,16 @@ fn main() {
     .expect("error while running tauri application");
 }
 
-// Switch function to invert webview positions
 fn switch_view(app: &AppHandle) {
   let state = app.state::<AppState>();
-  let mut flipped = state.flipped.lock().unwrap();
+  let mut index = state.state_index.lock().unwrap();
 
   let wv1_opt = state.webview1.lock().unwrap();
   let wv2_opt = state.webview2.lock().unwrap();
-
   if wv1_opt.is_none() || wv2_opt.is_none() {
     println!("Webviews not initialized");
     return;
   }
-
   let wv1 = wv1_opt.as_ref().unwrap();
   let wv2 = wv2_opt.as_ref().unwrap();
 
@@ -111,19 +97,47 @@ fn switch_view(app: &AppHandle) {
   let width = size.width as f64;
   let height = size.height as f64;
 
-  if *flipped {
-    wv1.set_position(LogicalPosition::new(0., 0.)).unwrap();
-    wv1.set_size(PhysicalSize::new(width, height)).unwrap();
+  match *index {
+    0 => {
+      // State 0 → State 1 (Telegram)
+      // main_window.set_title("Telegram").unwrap();
 
-    wv2.set_position(LogicalPosition::new(width, 0.)).unwrap();
-    wv2.set_size(PhysicalSize::new(0., height)).unwrap();
-  } else {
-    wv1.set_position(LogicalPosition::new(width, 0.)).unwrap();
-    wv1.set_size(PhysicalSize::new(0., height)).unwrap();
+      main_window.show().unwrap();
+      main_window.set_skip_taskbar(false).unwrap();
+      main_window.set_focus().unwrap();
+      main_window.set_always_on_top(true).unwrap();
+      main_window.set_always_on_top(false).unwrap();
 
-    wv2.set_position(LogicalPosition::new(0., 0.)).unwrap();
-    wv2.set_size(PhysicalSize::new(width, height)).unwrap();
+      wv1.set_position(LogicalPosition::new(width, 0.)).unwrap();
+      wv1.set_size(PhysicalSize::new(0, height as u32)).unwrap();
+
+      wv2.set_position(LogicalPosition::new(0., 0.)).unwrap();
+      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
+    }
+    1 => {
+      // State 1 → State 2 (hidden)
+      main_window.set_title("WATG").unwrap();
+
+      main_window.hide().unwrap();
+      main_window.set_skip_taskbar(true).unwrap();
+    }
+    _ => {
+      // State 2 → State 0 (WhatsApp)
+      // main_window.set_title("Whatsapp").unwrap();
+
+      main_window.show().unwrap();
+      main_window.set_skip_taskbar(false).unwrap();
+      main_window.set_focus().unwrap();
+      main_window.set_always_on_top(true).unwrap();
+      main_window.set_always_on_top(false).unwrap();
+
+      wv1.set_position(LogicalPosition::new(0., 0.)).unwrap();
+      wv1.set_size(PhysicalSize::new(width, height)).unwrap();
+
+      wv2.set_position(LogicalPosition::new(width, 0.)).unwrap();
+      wv2.set_size(PhysicalSize::new(0, height as u32)).unwrap();
+    }
   }
 
-  *flipped = !*flipped;
+  *index = (*index + 1) % 3;
 }
