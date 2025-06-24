@@ -3,10 +3,10 @@
 ### This app aims to merge WhatsApp Web & Telegram Web, with:
 - [x] Native window
 - [x] Hide-in-tray ability
-- [x] Unread count in taskbar
+- [x] Unread count in taskbar / titlebar
 - [ ] Unread count in tray icon
 - [ ] Custom notifications
-- [ ] Zoom controls (independend between WA and TG)
+- [ ] Customizable zoom settings
 
 
 > [!WARNING]
