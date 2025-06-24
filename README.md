@@ -26,12 +26,12 @@
 # <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/dev.png" height="27px"> DEV: <sub><sup> this is probably too basic for noobs and useless to experienced devs 🙃 anyway:</sup></sub>
 
 1. install prerequisites:
-   - `visual studio build tools 2022 (v17.14.6+36212.18.-june.2025-) ` > `MSVC compiler (v143)`
-   - `rustc 1.87.0 (17067e9ac 2025-05-09)`
-   - `tauri-cli 2.5.0`
+   1. [**Visual Studio Build Tools** 2022, v17.14.6 (June 2025)](https://download.visualstudio.microsoft.com/download/pr/4652b1eb-63f7-432d-84ab-06108c5d7cd7/579ca9f9b1824f8dfd2ca0dca0e7e3970ca2e4dba8ee91f2e938ed2c7f197054/vs_BuildTools.exe) <br/>› select `C++ build tools` with `MSVC v143`, `Windows10/11 SDK`
+   2. [**Rust** 1.87.0](https://static.rust-lang.org/dist/rust-1.87.0-x86_64-pc-windows-msvc.msi)<br/>› this also installes `cargo`
+   3. **Tauri** 2.5.0 <br/>› install via CLI with command `cargo install tauri-cli --version 2.5.0`
 2. download [`source-code`](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FDavidBevi%2FWATG%2Ftree%2Fmain%2Fsource-code) folder and unzip it where you want
    - (example: `C:\watg`)
-3. open a `cmd` in that folder and use these commands:
+3. open a CLI in that folder and use these commands:
     - `cargo tauri dev --features unstable` to run it like a dev, with autoreload when source files are saved
     - `cargo tauri build --features unstable` to export a portable executable in `src-tauri\target\release`
 
