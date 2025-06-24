@@ -25,10 +25,6 @@
 
 # <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/dev.png" height="27px"> DEV: <sub><sup> this is probably too basic for noobs and useless to experienced devs 🙃 anyway:</sup></sub>
 
-<details>
-  <summary>Install dependencies and run commands</summary>
-  <br/>
-
 1. install prerequisites:
    - `visual studio build tools 2022 (v17.14.6+36212.18.-june.2025-) ` > `MSVC compiler (v143)`
    - `rustc 1.87.0 (17067e9ac 2025-05-09)`
@@ -39,4 +35,4 @@
     - `cargo tauri dev --features unstable` to run it like a dev, with autoreload when source files are saved
     - `cargo tauri build --features unstable` to export a portable executable in `src-tauri\target\release`
 
-</details>
+<br/>
