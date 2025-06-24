@@ -1,4 +1,4 @@
-# ![WATG logo](https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png) WATG: Whatsapp+Telegram <sub><sup>v0.3-Alpha</sup></sub>
+# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png" height="27px"> WATG: Whatsapp+Telegram <sub><sup>v0.3-Alpha</sup></sub>
 
 ### This app aims to merge WhatsApp Web & Telegram Web, with:
 - [x] Native window
@@ -23,7 +23,7 @@
 
 <br/>
 
-# ![dev-icon](https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/dev.png) DEV: <sub><sup> Meant for myself (I tend to forget), but if you try it good luck, and gimme feedback! 😊</sup></sub>
+# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/dev.png" height="27px"> DEV: <sub><sup> Meant for myself (I tend to forget), but if you try it good luck, and gimme feedback! 😊</sup></sub>
 
 <details>
   <summary>Install dependencies and run commands</summary>
