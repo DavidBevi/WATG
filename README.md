@@ -23,7 +23,7 @@
 
 <br/>
 
-# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/dev.png" height="27px"> DEV: <sub><sup> Meant for myself (I tend to forget), but if you try it good luck, and gimme feedback! 😊</sup></sub>
+# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/dev.png" height="27px"> DEV: <sub><sup> this is probably too basic for noobs and useless to experienced devs 🙃 anyway:</sup></sub>
 
 <details>
   <summary>Install dependencies and run commands</summary>
