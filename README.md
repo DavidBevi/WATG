@@ -1,13 +1,12 @@
-# ![WATG logo](https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png?raw=true) WATG: Whatsapp+Telegram
+# ![WATG logo](https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png?raw=true) WATG: Whatsapp+Telegram <sub><sup>v0.3-Alpha</sup></sub>
 
-### A Tauri app for Windows (I'm unable to make it cross-platform 😢)
+> [!WARNING]
+> This app is made with Tauri for Windows (I'm unable to make it cross-platform 😢)<br/>
+> This is just a backup of my dev build, it's not ready for production (yet!)
 
-> [!WARNING]  
-> This is just a backup of my dev build, it's not ready for production.
+<br/>
 
-<br/><br/>
-
-## How to use/dev it <sub><sup> → Mainly for myself, I tend to forget → If you dare to try it good luck, and gimme feedback! 😊</sup></sub>
+## How to use/dev it <sub><sup> → Meant for myself (I tend to forget), but if you dare to try it good luck, and gimme feedback! 😊</sup></sub>
 
 <details>
   <summary>Install dependencies and run commands</summary>
@@ -30,7 +29,7 @@
    
 WATG window can show Whatsapp, show Telegram, be Hidden. To cycle through these states click on the tray icon.
 
-<br/><br/>
+<br/>
 
 ## Planned features <sub><sup> → Hopefully 🤞</sup></sub>
 
