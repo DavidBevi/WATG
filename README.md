@@ -1,17 +1,6 @@
 # ![WATG logo](https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png?raw=true) WATG: Whatsapp+Telegram <sub><sup>v0.3-Alpha</sup></sub>
 
-> [!WARNING]
-> - This app is made with Tauri for **Windows** (I'm unable to make it cross-platform 😢)
-> - This repo is meant as **a backup of my dev builds**, because WATG is not ready for production yet!
-> - There's a compiled executable [here](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.3-Alpha.exe), but I don't know if it works on other machines. **If you try to use it please tell me how it goes!**
-
-
-> [!TIP]
-> - **WATG** can [**show Whatsapp**] - [**show Telegram**] - [**be Hidden**]. To cycle through these 3 states **click on the tray icon**.
-
-<br/>
-
-# WATG <sub><sup>aims to merge WhatsApp & Telegram, with:</sup></sub>
+### This app aims to merge WhatsApp Web & Telegram Web, with:
 - [x] Native window
 - [x] Hide-in-tray ability
 - [x] Unread count in taskbar
@@ -19,9 +8,22 @@
 - [ ] Custom notifications
 - [ ] Zoom controls (independend between WA and TG)
 
+
+> [!WARNING]
+> - This app is made with Tauri, but it's only for **Windows** because I'm unable to make it cross-platform 😢
+> - This repo is meant as **a backup of my dev builds**, because WATG is still basic and rough.<br/>For example, it spawns where I want but only on my main computer, on my alt it spawns half off-screen 😕
+> - If despite everything you download [WATG-0.3-Alpha.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.3-Alpha.exe?raw=true) good luck, and tell me how it goes! 😁
+
+
+> [!TIP]
+> - **WATG** can [**show Whatsapp**] - [**show Telegram**] - [**be Hidden**]. To cycle through these 3 states **click on the tray icon**.
+
 <br/>
 
-# How to dev <sub><sup> → Meant for myself (I tend to forget), but if you try it good luck, and gimme feedback! 😊</sup></sub>
+
+<br/>
+
+# DEV: <sub><sup> Meant for myself (I tend to forget), but if you try it good luck, and gimme feedback! 😊</sup></sub>
 
 <details>
   <summary>Install dependencies and run commands</summary>
