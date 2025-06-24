@@ -1,12 +1,27 @@
 # ![WATG logo](https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png?raw=true) WATG: Whatsapp+Telegram <sub><sup>v0.3-Alpha</sup></sub>
 
 > [!WARNING]
-> - This app is made with Tauri for Windows (I'm unable to make it cross-platform 😢)
-> - This is just a backup of my dev build, it's not ready for production (yet!)
+> - This app is made with Tauri for **Windows** (I'm unable to make it cross-platform 😢)
+> - This repo is meant as **a backup of my dev builds**, because WATG is not ready for production yet!
+> - There's a compiled executable [here](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.3-Alpha.exe), but I don't know if it works on other machines. **If you try to use it please tell me how it goes!**
+
+
+> [!TIP]
+> - **WATG** can [**show Whatsapp**] - [**show Telegram**] - [**be Hidden**]. To cycle through these 3 states **click on the tray icon**.
 
 <br/>
 
-## How to use/dev it <sub><sup> → Meant for myself (I tend to forget), but if you dare to try it good luck, and gimme feedback! 😊</sup></sub>
+# WATG <sub><sup>aims to merge WhatsApp & Telegram, with:</sup></sub>
+- [x] Native window
+- [x] Hide-in-tray ability
+- [x] Unread count in taskbar
+- [ ] Unread count in tray icon
+- [ ] Custom notifications
+- [ ] Zoom controls (independend between WA and TG)
+
+<br/>
+
+# How to dev <sub><sup> → Meant for myself (I tend to forget), but if you try it good luck, and gimme feedback! 😊</sup></sub>
 
 <details>
   <summary>Install dependencies and run commands</summary>
@@ -23,17 +38,4 @@
     - `cargo tauri dev --features unstable` to run it like a dev, with autoreload when source files are saved
     - `cargo tauri build --features unstable` to export a portable executable in `src-tauri\target\release`
 
-<br/>
-
 </details>
-   
-WATG window can show Whatsapp, show Telegram, be Hidden. To cycle through these states click on the tray icon.
-
-<br/>
-
-## Planned features <sub><sup> → Hopefully 🤞</sup></sub>
-
-- [ ] make custom notifications
-- [ ] make zoom adjustable and persistent
-- [x] ~~make taskbar display unread count~~ done in v0.3
-- [ ] make tray icon display unread count
