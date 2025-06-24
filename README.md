@@ -32,6 +32,7 @@ WATG window can show Whatsapp, show Telegram, be Hidden. To cycle through these 
 
 ## Planned features <sub><sup> → Hopefully 🤞</sup></sub>
 
-- make zoom adjustable and persistent
-- make tray icon display unread count
-- make custom notifications
+- [ ] make custom notifications
+- [ ] make zoom adjustable and persistent
+- [x] ~~make taskbar display unread count~~ done in v0.3
+- [ ] make tray icon display unread count
