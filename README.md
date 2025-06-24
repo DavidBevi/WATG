@@ -1,8 +1,8 @@
 # ![WATG logo](https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png?raw=true) WATG: Whatsapp+Telegram <sub><sup>v0.3-Alpha</sup></sub>
 
 > [!WARNING]
-> This app is made with Tauri for Windows (I'm unable to make it cross-platform 😢)<br/>
-> This is just a backup of my dev build, it's not ready for production (yet!)
+> - This app is made with Tauri for Windows (I'm unable to make it cross-platform 😢)
+> - This is just a backup of my dev build, it's not ready for production (yet!)
 
 <br/>
 
