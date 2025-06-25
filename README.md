@@ -1,4 +1,4 @@
-# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png" height="27px"> WATG: Whatsapp+Telegram <sub><sup>v0.3-Alpha</sup></sub>
+# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/icon.png" height="27px"> WATG: Whatsapp+Telegram<sub><sup> - v0.3-Alpha - for Windows</sup></sub>
 
 ### This app aims to merge WhatsApp Web & Telegram Web, with:
 - [x] Native window
