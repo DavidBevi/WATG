@@ -1,6 +1,6 @@
 [package]
 name = "watg"
-version = "0.4.0"
+version = "0.4.1"
 description = "Whatsapp + Telegram"
 authors = ["DavidBevi"]
 edition = "2021"

@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]  // Avoid showing console (Windows only)
+ 
 use std::sync::Mutex;
 use tauri::{
   LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
