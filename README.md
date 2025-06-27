@@ -22,7 +22,7 @@
 
 <br/>
 
-# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/src/icons/icon-dev.svg" height="27px"> DEV: <sub><sup> this is probably too basic for noobs and useless to experienced devs 🙃 anyway:</sup></sub>
+# <img src="https://github.com/DavidBevi/WATG/blob/main/source-code/src-tauri/src/icons/icon-dev.png" height="27px"> DEV: <sub><sup> this is probably too basic for noobs and useless to experienced devs 🙃 anyway:</sup></sub>
 
 1. Install prerequisites:
    1. [**Visual Studio Build Tools** 2022, v17.14.6 (June 2025)](https://download.visualstudio.microsoft.com/download/pr/4652b1eb-63f7-432d-84ab-06108c5d7cd7/579ca9f9b1824f8dfd2ca0dca0e7e3970ca2e4dba8ee91f2e938ed2c7f197054/vs_BuildTools.exe) <br/>› select `C++ build tools` with `MSVC v143`, `Windows10/11 SDK`
