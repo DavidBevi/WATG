@@ -11,7 +11,7 @@
 > [!WARNING]
 > - This app is made with Tauri, but it's only for **Windows** because I'm unable to make it cross-platform 😢
 > - This repo is meant as **a backup of my dev builds**, because WATG is still basic and rough.<br/>For example, it spawns where I want but only on my main computer, on my alt it spawns half off-screen 😕
-> - If despite everything you download [WATG-0.4-Alpha.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.4-Alpha.exe?raw=true) good luck, and tell me how it goes! 😁
+> - If despite everything you download [WATG-0.4.1-Alpha.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.4.1-Alpha.exe?raw=true) good luck, and tell me how it goes! 😁
 
 
 > [!TIP]
