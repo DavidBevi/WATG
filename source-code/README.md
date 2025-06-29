@@ -1,4 +1,4 @@
-This file is supposed to be in `watg/src-tauri`
+This file is supposed to be in `watg/source-code`
 
 # File tree of necessary `watg` files
 
