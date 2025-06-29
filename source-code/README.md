@@ -28,4 +28,4 @@
 
 ### (3) Output:
 
-- You now can find `scr-tauri/target/releases/watg.exe`, this file is the portable app. Enjoy!
+- You now can find `src-tauri\target\x86_64-pc-windows-msvc\release\watg.exe`, this file is the portable app. Enjoy!
