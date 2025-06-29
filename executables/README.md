@@ -1,7 +1,9 @@
-This is `executables/README.md`
+`executables/README.md`
 
-# Still in Alpha 
+# `WATG.exe`s
 
-### Please, give feedback if you try to use WATG 
+> [!Caution]
+> WATG is still in Alpha 
 
-Version 0.5 is the first with CRT static linking, which means it doesn't need you to install C++
+> [!Note]
+> **Versions prior to 0.5 need Microsoft Visual C++ Redistributable**, later versions remove this dependency with CRT static linking.
