@@ -5,11 +5,11 @@ This is `watg/source-code/README.md`
 ### (1) Needed files:
 
 ```
-📁src-tauri/                  # Root folder, compile here
+📁src-tauri/                  
 ├ 📁.cargo/               
 │ └ config.toml               # [Rust/Cargo] Enables CRT static linking
 ├ 📁capabilities/
-│ └ window-state.json         # Plugin permissions for window-state plugin
+│ └ window-state.json         # [Tauri] Permissions for window-state plugin
 ├ 📁src/                     
 │ ├ 📁icons/                
 │ │ └ icon-watg-{0..10}.png   # Icons for bundle and tray
