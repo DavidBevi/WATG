@@ -21,7 +21,7 @@ This is `watg/source-code/README.md`
 └ tauri.conf.json             # [Tauri] Defines app/bundle
 ```
 
-### (2) Command Line Interface:
+### (2) Build:
 
 1. open a CLI in `src-tauri`
 2. run `cargo tauri build --features unstable`
