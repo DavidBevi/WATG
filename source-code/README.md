@@ -1,4 +1,4 @@
-This is `watg/source-code/README.md`
+`source-code/README.md`
 
 # How to compile
 
