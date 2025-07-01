@@ -1,7 +1,7 @@
 `src-tauri/README.md`
 
 # How to compile
-The following *should* be everything you need, but this is my first project and I'm not really sure.
+The following *should* be everything you need, but this is my first project and I'm not sure I'm doing it right 😅
 
 <br/>
 
@@ -16,26 +16,26 @@ The following *should* be everything you need, but this is my first project and 
 
 
 
-### Download `src-tauri` folder
+### Download [`src-tauri.zip`](https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FDavidBevi%2FWATG%2Ftree%2Fmain%2Fsrc-tauri) and unzip it
 ```
 𝐅𝐈𝐋𝐄 𝐓𝐑𝐄𝐄 𝐎𝐅 𝐍𝐄𝐄𝐃𝐄𝐃 𝐅𝐈𝐋𝐄𝐒
-Letters stand for which program needs it (𝐂argo, 𝐓auri, 𝐖atg)
-------------------------------------------------------------------------
+C= needed by Cargo   |   T= needed by Tauri   |   W= code/res of WATG
+-----------------------------------------------------------------------
 📁src-tauri/                  
 ├ 📁.cargo/                
-│ └ config.toml             C   Enables CRT static linking
+│ └ config.toml            C    Enables CRT static linking
 ├ 📁capabilities/
-│ └ window-state.json       T   Permissions for window-state plugin
+│ └ window-state.json      T    Permissions for window-state plugin
 ├ 📁src/                     
 │ ├ 📁icons/                
-│ │ └ icon-watg.ico         W   Icon for the Titlebar and Taskbar
-│ │ └ tray-{0..10}.png      W   Icons for bundle and tray
+│ │ └ icon-watg.ico        W    Icon for the Titlebar and Taskbar
+│ │ └ tray-{0..10}.png     W    Icons for bundle and tray
 │ ├ 📁scripts/              
-│ │ ├ wa.js                 W   JS badge logic + UI mods for WhatsApp
-│ │ └ tg.js                 W   JS badge logic for Telegram
-│ └ main.rs                 W   Main Rust source for Tauri app
-├ Cargo.toml                C   Crates, dependencies, plugins, features
-└ tauri.conf.json           T   Defines app/bundle
+│ │ ├ wa.js                W    JS badge logic + UI mods for WhatsApp
+│ │ └ tg.js                W    JS badge logic for Telegram
+│ └ main.rs                W    Main Rust source for WATG
+├ Cargo.toml               C    Crates, dependencies, plugins, features
+└ tauri.conf.json          T    Defines app/bundle
 ```
 
 <br/>
@@ -44,7 +44,7 @@ Letters stand for which program needs it (𝐂argo, 𝐓auri, 𝐖atg)
 
 ### Build
 - Open a CLI in `src-tauri` & run `cargo tauri build --features unstable`
-- Or just open `𝐃𝐎𝐔𝐁𝐋𝐄-𝐂𝐋𝐈𝐂𝐊-𝐓𝐎-𝐁𝐔𝐈𝐋𝐃.bat`
+- Or just open `𝐃𝐎𝐔𝐁𝐋𝐄-𝐂𝐋𝐈𝐂𝐊-𝐓𝐎-𝐁𝐔𝐈𝐋𝐃.bat`, which does the same things
 
 <br/>
 
