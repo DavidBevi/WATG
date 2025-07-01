@@ -1,9 +1,8 @@
 `executables/README.md`
 
-# `WATG.exe`s
+# ⚠️ WATG is still in development
+**WATG should run on any Windows machine**, but I'm not super confidend about it (I've only tested it only on 3 computers).
 
-> [!Caution]
-> WATG is still in Alpha 
+<br/>
 
-> [!Note]
-> **Versions prior to 0.5 need Microsoft Visual C++ Redistributable**, later versions remove this dependency with CRT static linking.
+### Please [report any issue](https://github.com/DavidBevi/WATG/issues), and I'll try to address it!
