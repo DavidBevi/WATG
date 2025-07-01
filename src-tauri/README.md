@@ -1,4 +1,4 @@
-`source-code/README.md`
+`src-tauri/README.md`
 
 # How to compile
 
