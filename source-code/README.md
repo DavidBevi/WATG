@@ -6,20 +6,23 @@
 
 ```
 📁src-tauri/                  
-├ 📁.cargo/               
-│ └ config.toml               # [Rust/Cargo] Enables CRT static linking
+├ 📁.cargo/                
+│ └ config.toml             C   Enables CRT static linking
 ├ 📁capabilities/
-│ └ window-state.json         # [Tauri] Permissions for window-state plugin
+│ └ window-state.json       T   Permissions for window-state plugin
 ├ 📁src/                     
 │ ├ 📁icons/                
-│ │ └ icon-watg-{0..10}.png   # Icons for bundle and tray
+│ │ └ icon-watg.ico         W   Icon for the Titlebar and Taskbar
+│ │ └ tray-{0..10}.png      W   Icons for bundle and tray
 │ ├ 📁scripts/              
-│ │ ├ wa.js                   # JS badge logic + UI mods for WhatsApp
-│ │ └ tg.js                   # JS badge logic for Telegram
-│ └ main.rs                   # Main Rust source for Tauri app
-├ Cargo.toml                  # [Rust/Cargo] Cates, dependencies, plugin, features]
-└ tauri.conf.json             # [Tauri] Defines app/bundle
+│ │ ├ wa.js                 W   JS badge logic + UI mods for WhatsApp
+│ │ └ tg.js                 W   JS badge logic for Telegram
+│ └ main.rs                 W   Main Rust source for Tauri app
+├ Cargo.toml                C   Crates, dependencies, plugins, features
+└ tauri.conf.json           T   Defines app/bundle
 ```
+
+Letters stand for which program needs it (**C**argo, **T**auri, **W**atg)
 
 ### (2) Build:
 
