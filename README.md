@@ -27,5 +27,5 @@
 
 # <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/icon-dev.png" height="25px"> Development
 WATG is a project I'm making for myself, but I'd like others to be able to use it and customize it further.<br/>
-[**Build tools and instructions**](https://github.com/DavidBevi/WATG/blob/main/src-tauri/README.md) (probably too basic for noobs and useless to experienced devs, but hey 🤷 I did my best 🙃) </sup></sub>
+[**Build tools and instructions**](https://github.com/DavidBevi/WATG/blob/main/src-tauri/README.md) (probably too basic for noobs and useless to experienced devs, but I did my best 🙃)
 
