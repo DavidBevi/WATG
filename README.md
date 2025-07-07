@@ -1,4 +1,4 @@
-# <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/icon-watg.png" height="25px"> WATG: Whatsapp+Telegram<sub><sup> - v0.6-Alpha - for Windows</sup></sub>
+# <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/icon-watg.png" height="25px"> WATG: Whatsapp+Telegram<sub><sup> - v0.6.1-Alpha - for Windows</sup></sub>
 
 ### WATG combines WhatsApp Web & Telegram Web in a super-light app, with:
 - [x] Native window with reactive UI (using [my WA mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js))
@@ -14,7 +14,7 @@
 > - This app is made with Tauri, but it's only for **Windows** because I'm unable to make it cross-platform 😢
 > - Whatsapp doesn't provide a "narrow-layout", but I made [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to inject it.
 > 
-> If despite everything you download [WATG-0.6-Alpha.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.6-Alpha.exe?raw=true) good luck, and tell me how it goes! 😁
+> If despite everything you download [WATG-0.6.1-Alpha.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.6.1-Alpha.exe?raw=true) good luck, and tell me how it goes! 😁
 
 
 > [!TIP]
