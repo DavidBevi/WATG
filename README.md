@@ -5,7 +5,6 @@
 - [x] Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]
 - [x] Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/tray-all.png" height="12px">
 - [x] Unread count in taskbar / titlebar (text)
-- [x] Zoom in/out with `Ctrl`+`+`, `Ctrl`+`-`, `Ctrl`+`MouseWheel`
 - [ ] Custom notifications
 
 
