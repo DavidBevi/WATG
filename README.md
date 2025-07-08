@@ -2,7 +2,7 @@
 
 ### WATG combines WhatsApp Web & Telegram Web in a super-light app, with:
 - [x] Native window with reactive UI (using [my WA mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js))
-- [x] Hide-in-tray ability
+- [x] Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]
 - [x] Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/tray-all.png" height="12px">
 - [x] Unread count in taskbar / titlebar (text)
 - [x] Zoom in/out with `Ctrl`+`+`, `Ctrl`+`-`, `Ctrl`+`MouseWheel`
