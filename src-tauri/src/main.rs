@@ -11,6 +11,7 @@ use tauri::{
 use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 use tauri::image::Image;
 
+
 #[cfg(target_os = "windows")]
 fn show_error_dialog(message: &str) {
   use std::ffi::OsStr;
@@ -196,6 +197,7 @@ fn main() {
 
       let wv1 = window.add_child(
         tauri::webview::WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
+          .zoom_hotkeys_enabled(true)
           .initialization_script(&format!("window.label='WA';{}", js_wa))
           .auto_resize(),
         LogicalPosition::new(0., 0.),
@@ -205,6 +207,7 @@ fn main() {
 
       let wv2 = window.add_child(
         tauri::webview::WebviewBuilder::new("TG", WebviewUrl::External("https://web.telegram.org/k/".parse().unwrap()))
+          .zoom_hotkeys_enabled(true)
           .initialization_script(&format!("window.label='TG';{}", js_tg))
           .auto_resize(),
         LogicalPosition::new(width, 0.),
@@ -277,3 +280,4 @@ fn switch_view(app: &AppHandle) {
 
   *idx = (*idx + 1) % 3;
 }
+
