@@ -11,7 +11,7 @@
 > [!WARNING]
 > WATG is made with Tauri, but it's only for **Windows** because I'm unable to make it cross-platform 😢
 >
-> Whatsapp doesn't provide a "narrow-layout", but I made [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to inject it. I can't get rid of a thin vertical border, because I cannot identify what's producing it 🤷
+> Whatsapp doesn't provide a "narrow-layout", so I made [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to inject it. Unfortunately I can't hide a thin vertical line, you'll have to cope with it 🤷
 > 
 > If despite everything you download [WATG-0.7-Beta.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.7-Beta.exe?raw=true) good luck, and tell me how it goes! 😁
 
