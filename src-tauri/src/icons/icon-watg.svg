@@ -1,48 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" 
-     width="16" height="16" viewBox="-8 -8 16 16">
+     width="64" height="64" viewBox="0 0 64 64">
   <defs>
     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#28D146" />
-      <stop offset="35%" stop-color="#25D366" />
-      <stop offset="75%" stop-color="#27A7E7" />
-      <stop offset="100%" stop-color="#0088CC" />
+      <stop offset="35%" stop-color="#1A892E" />
+      <stop offset="75%" stop-color="#007AB8" />
+      <stop offset="100%" stop-color="#33BBFF" />
     </linearGradient>
 
-    
-    <path id="bubble" d="M0-8C8-8 8-8 8-1 8 6 8 6 1 6 0 7-2 8-3 8-2 6-3 6-3 6-7.3 6-8 6-8 0-8-8-8-8 0-8Z"/>
-    <path id="1" d="M-2.5 -3 L0.5 -5.1 V4.1"/>
-    <path id="2" d="M-2.5-3C-2.4-5.8 2.4-5.8 2.5-3 2.5 0-2.5 0-2.5 2.9H3.5"/>
-    <path id="3" d="M-3.3-5 2.5-5 0-1.5Q2.5-1 2.5 1C2.5 3.6-2.5 3.6-2.5 1"/>
-    <path id="4" d="M1.2 4.1 V-5.1 L-2.7 0.8 H3.5"/>
-    <path id="5" d="M2.8-5-2.3-5-2.5-1.4Q2.5-2.4 2.5 1C2.5 3.6-2.5 3.6-2.5 1"/>
-    <path id="6" d="M1.4-5.4Q-2.5-3-2.5.5C-2.5 3.8 2.5 3.6 2.5.8 2.5-2-1-2-2.4-.6"/>
-    <path id="7" d="M-3-4.8 2.8-4.8-1.3 3.7"/>
-    <path id="8" d="M-.2-1.3C-2.6-1.3-2.5-5.1 0-5.1S2.6-1.3.2-1.3A2.5 2.2 0 11-.2-1.3Z"/>
-    <path id="9" d="M-1.4 3.4Q2.5 1 2.5-2.5C2.5-5.8-2.5-5.6-2.5-2.8-2.5 0 1 0 2.4-1.4"/>
-    <path id="X" d="M-4.1 3.4Q-1 1-1-2.5C-1-5.8-5-5.6-5-2.8-5 0-2.5 0-1.1-1.4M.6-1h5.4M3.3-4v6"/>
-    <path id="dev" d="M-3 -4 L-5.5 -1 -3 2    M-1 3.5 L 1 -5.5   M3 -4 L5.5 -1 3 2"/>
+    <filter id="blur" x="0" y="0">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" />
+    </filter>
+
+    <path id="bubble" d="M32 2C62 2 62 2 62 28 62 54 62 54 36 54 32 60 24 62 20 62 24 56 21 54 21 54 6 54 2 54 2 32 2 2 2 2 32 2Z"/>
+    <mask id="mask"><use href="#bubble" fill="white"/></mask>
+
+    <path id="1" d="M64 0M0 64M22 20 34 13V47"/>
+    <path id="2" d="M64 0M0 64M22 20C22 10 42 10 42 20 42 32 22 32 22 43H46"/>
+    <path id="3" d="M64 0M0 64M19 13 42 13 32 26Q42 28 42 36C42 46 22 46 22 36"/>
+    <path id="4" d="M64 0M0 64M37 47V13H34L21 33V35H46"/>
+    <path id="5" d="M64 0M0 64M43 13 23 13 22 27Q42 22 42 35C42 46 22 46 22 36"/>
+    <path id="6" d="M64 0M0 64M40 13C36 12 33 12 28 15Q22 19 22 31C22 48 42 47 42 35 42 26 28 24 23 30"/>
+    <path id="7" d="M64 0M0 64M20 14 43 14 27 46"/>
+    <path id="8" d="M64 0M0 64M31 27C22 27 22 12 32 12S42 27 33 27A10 8.5 0 1131 27Z"/>
+    <path id="9" d="M64 0M0 64M26 45Q42 40 42 21C42 9 22 9 22 21 22 32 36 32 41 27"/>
+    <path id="X" d="M64 0M0 64M54 0M-10 64M16 44Q31 42 31 21C31 9 13 9 13 21 13 32 26 32 30 27M34 28h22M45 16v24"/>
+    <path id="dev" d="M64 0M0 64M20 17 10 28 20 39M28 46 36 10M44 17 54 28 44 39"/>
   </defs>
 
-  <use href="#bubble"
-    fill="url(#grad)"
-    stroke="black"
-    stroke-opacity="0.5"
-    stroke-width="1.2"
-    stroke-linejoin="round"
-    transform="scale (0.94)"
-  />
+<!-- BubbleBG (colored) -->
+  <use href="#bubble" fill="url(#grad)"/>
+  <use href="#bubble" fill="black" fill-opacity="0"/> <!-- 0.75 for no notification -->
 
-  <use href="#bubble"
-    fill="black"
-    fill-opacity="0.25"
-    stroke="white"
-    stroke-width="1"
-    stroke-linejoin="round"
-    transform="scale (0.94)"
-  />
+<!-- Blurs (black) -->
+  <use href="#bubble" stroke="black" stroke-linejoin="round" stroke-width="4" fill-opacity="0" filter="url(#blur)" mask="url(#mask)"/>
+  <use href="#Xa" stroke="black" stroke-linejoin="round" stroke-width="9.2" fill-opacity="0" filter="url(#blur)" mask="url(#mask)"/>
 
-  <use href="#NUMBER" stroke="black" stroke-linejoin="round" stroke-width="2.3" fill-opacity="0" 
-    stroke-opacity="0.5"/>
-  <use href="#NUMBER" stroke="white" stroke-linejoin="round" stroke-width="2.1" fill-opacity="0"/>
+<!-- Edges (white) -->
+  <use href="#bubble" stroke="white" stroke-width="4" stroke-linejoin="round" fill-opacity="0"/>
+  <use href="#Xa" stroke="white" stroke-linejoin="round" stroke-width="8.4" fill-opacity="0"/>
   
 </svg>
