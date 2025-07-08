@@ -5,14 +5,14 @@
 - [x] Hide-in-tray ability
 - [x] Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/tray-all.png" height="12px">
 - [x] Unread count in taskbar / titlebar (text)
+- [x] Zoom in/out with `Ctrl`+`+`, `Ctrl`+`-`, `Ctrl`+`MouseWheel`
 - [ ] Custom notifications
-- [ ] Customizable zoom settings
 
 
 > [!WARNING]
-> WATG is still quite rough, you should be aware that:
-> - This app is made with Tauri, but it's only for **Windows** because I'm unable to make it cross-platform 😢
-> - Whatsapp doesn't provide a "narrow-layout", but I made [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to inject it. I can't get rid of a thin vertical border, because I cannot identify what's producing it 🤷
+> WATG is made with Tauri, but it's only for **Windows** because I'm unable to make it cross-platform 😢
+>
+> Whatsapp doesn't provide a "narrow-layout", but I made [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to inject it. I can't get rid of a thin vertical border, because I cannot identify what's producing it 🤷
 > 
 > If despite everything you download [WATG-0.7-Beta.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.7-Beta.exe?raw=true) good luck, and tell me how it goes! 😁
 
