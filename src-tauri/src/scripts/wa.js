@@ -1,5 +1,7 @@
 function debugAndSend() {
-  const spans = Array.from(document.querySelectorAll('span'));
+  const parentElement = document.querySelector('#pane-side');
+  if (!parentElement) { console.error('Parent element #pane-side not found.'); return; }
+  const spans = Array.from(parentElement.querySelectorAll('span'));
   const unreadBadges = spans.filter(el => {
     const style = window.getComputedStyle(el);
     const bg = style.backgroundColor;
@@ -8,7 +10,7 @@ function debugAndSend() {
            (name === 'da leggere' || name.includes('non lett') ||
             name === 'unread' || name.includes('unread'));
   });
-  const count = unreadBadges.length > 0 ? unreadBadges.length : '_';
+  const count = unreadBadges.length <= 0 ? '_' : unreadBadges.length;
   window.__TAURI__.core.invoke('report_title', { title: count.toString(), label: window.label });
 }
 
