@@ -21,7 +21,7 @@
 
 <br/>
 
-### If despite everything you download [WATG-0.7-Beta.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.7-Beta.exe?raw=true) good luck, and [tell me how it goes](https://github.com/DavidBevi/WATG/issues/new)! 😁
+### If you download [WATG-0.7-Beta.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.7-Beta.exe?raw=true) good luck, and [tell me how it goes](https://github.com/DavidBevi/WATG/issues/new)! 😁
 
 
 <br/>
