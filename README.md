@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/watg-title.png" width="300pt"></p>
 
-<br/> 
+<p align="center">v0.7 Beta - for Windows 10/11</p>
 
 ### WATG combines WhatsApp Web & Telegram Web in a super-light app, with:
 - [x] Native window with reactive UI (using [my WA mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js))
