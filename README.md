@@ -3,25 +3,23 @@
 <p align="center">v0.7 Beta - for Windows 10/11</p>
 
 ### WATG combines WhatsApp Web & Telegram Web in a super-light app, with:
-- [x] Native window with reactive UI (using [my WA mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js))
-- [x] Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]
-- [x] Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/tray-preview.png" height="13px">
-- [x] Unread count in taskbar / titlebar (text)
-- [ ] Custom notifications
+> [!TIP]
+> - [x] Native window with reactive UI (using [my WA mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js))
+> - [x] Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]
+> - [x] Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/tray-preview.png" height="13px">
+> - [x] Unread count in taskbar / titlebar (text)
 
+> [!CAUTION]
+> - [ ] Notifications are not managed yet
+> - [ ] Links are not handled by the web browser yet
+> - [ ] Probably a bunch of other stuff that I didn't think about, yet
 
 > [!WARNING]
-> WATG is made with Tauri, but I'll make executables only for **Windows**. For other systems you can refer to **Development** section below.
->
-> Whatsapp doesn't provide a "narrow-layout", so I had to make [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to enable a good experience even when WATG has a narrow window. I can't find a way to hide thin vertical line, and some elements of the UI are not yet modded, so you'll have to cope with it or mod my mod and then rebuild WATG.
-> 
-> If despite everything you download [WATG-0.7-Beta.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.7-Beta.exe?raw=true) good luck, and tell me how it goes! 😁
+> - WATG is made with Tauri, but I'll make executables only for **Windows**. For other systems you can refer to **Development** section below.
+> - Whatsapp doesn't provide a "narrow-layout", so I had to make [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to enable a good experience even when WATG has a narrow window. I can't find a way to hide thin vertical line, and some elements of the UI are not yet modded, so you'll have to cope with it or mod my mod and then rebuild WATG.
 
+If despite everything you download [WATG-0.7-Beta.exe](https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.7-Beta.exe?raw=true) good luck, and tell me how it goes! 😁
 
-> [!TIP]
-> - **WATG** can [**show Whatsapp**] - [**show Telegram**] - [**be Hidden**]. To cycle through these 3 states **click on the tray icon**.
-
-<br/>
 
 
 <br/>
