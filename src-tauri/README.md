@@ -1,6 +1,6 @@
 `src-tauri/README.md`
 
-# How to compile
+# <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/icon-dev.png" height="25px"> How to compile
 The following *should* be everything you need, but this is my first project and I'm not sure I'm doing it right 😅
 
 <br/>
