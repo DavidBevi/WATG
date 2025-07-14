@@ -1,30 +1,47 @@
-#![windows_subsystem = "windows"]  // Avoid showing console (Windows only)
+//,-------------------------------------------------------------------------------------,
+//| main.rs - entry point for WATG Tauri app                                            |
+//| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+//| This file contains all cross-platform logic and delegates                           |
+//| platform-specific code to for_[platform].rs                                         |
+//'-------------------------------------------------------------------------------------'
 
-use std::{sync::Mutex, fs::File, io::Write};
+// Import core features, for every platform ---------------------------------------------
+use std::{fs::File, io::Write, sync::Mutex};
 use tauri::{
-  LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
-  AppHandle, Manager,
-  tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent, TrayIcon},
+  AppHandle, Manager, LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
+  tray::{TrayIcon},  // TrayIconEvent, MouseButton, MouseButtonState},
   menu::{Menu, MenuItem},
-  webview::Webview,
+  image::Image,
+  webview::{Webview, WebviewBuilder},
 };
 use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
-use tauri::image::Image;
 
+// Import platform specific logic -------------------------------------------------------
+#[cfg(target_os="windows")] mod for_windows;
+#[cfg(target_os="windows")] use for_windows as platform;
+#[cfg(target_os="linux")] mod for_linux;
+#[cfg(target_os="linux")] use for_linux as platform;
+#[cfg(target_os="macos")] mod for_macos;
+#[cfg(target_os="macos")] use for_macos as platform;
 
-#[cfg(target_os = "windows")]
-fn show_error_dialog(message: &str) {
-  use std::ffi::OsStr;
-  use std::iter::once;
-  use std::os::windows::ffi::OsStrExt;
-  use windows_sys::Win32::UI::WindowsAndMessaging::{MessageBoxW, MB_ICONERROR, MB_OK};
+// Disable terminal window on Windows ---------------------------------------------------
+#![cfg_attr(target_os="windows", windows_subsystem="windows")] 
+// OFF for debug, DO NOT DELETE ---------------------------------------------------------
 
-  let wide: Vec<u16> = OsStr::new(message).encode_wide().chain(once(0)).collect();
-  unsafe {
-    MessageBoxW(std::ptr::null_mut(), wide.as_ptr(), wide.as_ptr(), MB_OK | MB_ICONERROR);
-  }
+// Shared application state, accessible from commands and UI events ---------------------
+struct AppState {
+  state_index: Mutex<u8>,
+  webview_wa: Mutex<Option<Webview>>,
+  webview_tg: Mutex<Option<Webview>>,
+  title_wa: Mutex<String>,
+  title_tg: Mutex<String>,
+  tray: Mutex<Option<TrayIcon>>,
+  badge_wa: Mutex<u8>,
+  badge_tg: Mutex<u8>,
+  tray_icons: Vec<Image<'static>>,
 }
 
+// Called on panic: logs to file and shows an error dialog (only on Windows) ------------
 fn setup_error_hook() {
   std::panic::set_hook(Box::new(|info| {
     let msg = if let Some(s) = info.payload().downcast_ref::<&str>() {
@@ -39,37 +56,19 @@ fn setup_error_hook() {
     let _ = File::create("watg-error.log").and_then(|mut f| f.write_all(log.as_bytes()));
 
     #[cfg(target_os = "windows")]
-    show_error_dialog(msg);
+    platform::show_error_dialog(msg);
   }));
 }
 
-// Application state holds both WebView handles and their last-reported titles
-struct AppState {
-  state_index: Mutex<u8>,     // 0=WA, 1=TG, 2=Hidden
-  webview_wa: Mutex<Option<Webview>>,
-  webview_tg: Mutex<Option<Webview>>,
-  title_wa: Mutex<String>,
-  title_tg: Mutex<String>,
-  tray: Mutex<Option<TrayIcon>>,
-  badge_wa: Mutex<u8>,
-  badge_tg: Mutex<u8>,
-  tray_icons: Vec<Image<'static>>,
-}
-
+// Called from JS to report a new title and update tray icon accordingly ----------------
 #[tauri::command]
 fn report_title(app: AppHandle, title: String, label: String) {
   let state = app.state::<AppState>();
-
   {
     let mut wa = state.title_wa.lock().unwrap();
     let mut tg = state.title_tg.lock().unwrap();
-    if label == "WA" {
-      *wa = title.clone();
-    } else {
-      *tg = title.clone();
-    }
+    if label == "WA" { *wa = title.clone(); } else { *tg = title.clone(); }
   }
-
   if let Some(w) = app.get_window("main") {
     let wa = state.title_wa.lock().unwrap();
     let tg = state.title_tg.lock().unwrap();
@@ -80,44 +79,97 @@ fn report_title(app: AppHandle, title: String, label: String) {
     );
     let _ = w.set_title(&full);
   }
-
   let count = if title == "_" { 0 } else { title.parse::<u8>().unwrap_or(0) };
-
   {
     let mut badge_wa = state.badge_wa.lock().unwrap();
     let mut badge_tg = state.badge_tg.lock().unwrap();
-    if label == "WA" {
-      *badge_wa = count;
-    } else {
-      *badge_tg = count;
-    }
-
-    let total = badge_wa.saturating_add(*badge_tg);
-    update_tray_icon(&app, total);
+    if label == "WA" { *badge_wa = count; } else { *badge_tg = count; }
+    update_tray_icon(&app, badge_wa.saturating_add(*badge_tg));
   }
 }
 
+// Called from JS to update only the badge count ----------------------------------------
 #[tauri::command]
 fn report_badges(app: AppHandle, count: String, label: String) {
   let n = count.parse::<u8>().unwrap_or(0);
   let state = app.state::<AppState>();
-  match label.as_str() {
-    "WA" => *state.badge_wa.lock().unwrap() = n,
-    "TG" => *state.badge_tg.lock().unwrap() = n,
-    _ => (),
+  if label == "WA" {
+    *state.badge_wa.lock().unwrap() = n;
+  } else {
+    *state.badge_tg.lock().unwrap() = n;
   }
-
-  let wa = *state.badge_wa.lock().unwrap();
-  let tg = *state.badge_tg.lock().unwrap();
-  update_tray_icon(&app, wa.saturating_add(tg));
+  let total = state.badge_wa.lock().unwrap().saturating_add(*state.badge_tg.lock().unwrap());
+  update_tray_icon(&app, total);
 }
 
+// Called from JS to send a native system notification ----------------------------------
+#[tauri::command]
+fn notify(title: String, body: String) {
+  println!("🔥 main.rs → notify(): title='{}' body='{}'", title, body);
+  platform::send_notification(&title, &body);
+}
+
+// Updates the tray icon image based on the badge count (delegates to platform) ---------
+fn update_tray_icon(app: &AppHandle, count: u8) {
+  let icon_index = count.min(10);
+  let state = app.state::<AppState>();
+  let tray = state.tray.lock().unwrap();
+  if let Some(tray) = tray.as_ref() {
+    let image = state.tray_icons[icon_index as usize].clone();
+    platform::set_tray_icon(tray, image);
+  }
+}
+
+// Switches between: WA view, TG view, and hidden state ---------------------------------
+fn switch_view(app: &AppHandle) {
+  let state = app.state::<AppState>();
+  let mut idx = state.state_index.lock().unwrap();
+  let wv1 = state.webview_wa.lock().unwrap().as_ref().unwrap().clone();
+  let wv2 = state.webview_tg.lock().unwrap().as_ref().unwrap().clone();
+  let w = app.get_window("main").unwrap();
+  let size = w.inner_size().unwrap();
+  let (width, height) = (size.width as f64, size.height as f64);
+
+  match *idx {
+    0 => { // Show TG
+      w.show().unwrap();
+      w.set_skip_taskbar(false).unwrap();
+      w.set_focus().unwrap();
+      w.set_always_on_top(true).unwrap();
+      w.set_always_on_top(false).unwrap();
+      wv1.set_position(LogicalPosition::new(width, 0.)).unwrap();
+      wv1.set_size(PhysicalSize::new(0, height as u32)).unwrap();
+      wv2.set_position(LogicalPosition::new(0., 0.)).unwrap();
+      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
+    }
+    1 => { // Hide window
+      w.hide().unwrap();
+      w.set_skip_taskbar(true).unwrap();
+    }
+    _ => { // Show WA
+      w.show().unwrap();
+      w.set_skip_taskbar(false).unwrap();
+      w.set_focus().unwrap();
+      w.set_always_on_top(true).unwrap();
+      w.set_always_on_top(false).unwrap();
+      wv1.set_position(LogicalPosition::new(0., 0.)).unwrap();
+      wv1.set_size(PhysicalSize::new(width, height)).unwrap();
+      wv2.set_position(LogicalPosition::new(width, 0.)).unwrap();
+      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
+    }
+  }
+
+  *idx = (*idx + 1) % 3;
+}
+
+// Main ---------------------------------------------------------------------------------
 fn main() {
-  setup_error_hook(); // Must be the first line inside main()
+  setup_error_hook();
 
   let js_wa = include_str!("scripts/wa.js").to_string();
   let js_tg = include_str!("scripts/tg.js").to_string();
 
+  // Load tray icons for badge counts 0..10
   let mut icons = Vec::with_capacity(11);
   for i in 0..=10 {
     let bytes: &[u8] = match i {
@@ -140,6 +192,7 @@ fn main() {
 
   tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
+    .plugin(tauri_plugin_opener::init())
     .manage(AppState {
       state_index: Mutex::new(0),
       webview_wa: Mutex::new(None),
@@ -151,52 +204,31 @@ fn main() {
       badge_tg: Mutex::new(0),
       tray_icons: icons,
     })
-    .invoke_handler(tauri::generate_handler![report_title, report_badges])
+    .invoke_handler(tauri::generate_handler![report_title, report_badges, notify])
     .setup(move |app| {
       let switch_i = MenuItem::with_id(app, "switch", "Switch", true, None::<&str>)?;
       let menu = Menu::with_items(app, &[&switch_i])?;
-      let tray = TrayIconBuilder::new()
-        .icon(app.default_window_icon().unwrap().clone())
-        .on_tray_icon_event(|app, event| {
-          if let TrayIconEvent::Click {
-            button: MouseButton::Left,
-            button_state: MouseButtonState::Up,
-            ..
-          } = event {
-            switch_view(&app.app_handle());
-          }
-        })
-        .menu(&menu)
-        .show_menu_on_left_click(false)
-        .on_menu_event(|app, event| {
-          if event.id.as_ref() == "switch" {
-            switch_view(app);
-          }
-        })
-        .build(app)?;
-
+      let tray = platform::create_tray_icon(&app.handle(), &menu)?;
       app.state::<AppState>().tray.lock().unwrap().replace(tray);
 
       let window = tauri::window::WindowBuilder::new(app, "main").build()?;
       window.restore_state(StateFlags::all()).unwrap();
       window.set_title("WATG: --").unwrap();
-
       {
-        use tauri::WindowEvent;
         let app_handle = app.handle().clone();
         window.on_window_event(move |event| {
-          if matches!(event, WindowEvent::Moved(_) | WindowEvent::Resized(_)) {
+          if matches!(event, tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)) {
             let _ = app_handle.save_window_state(StateFlags::all());
           }
         });
       }
 
       let size = window.inner_size().unwrap();
-      let width = size.width as f64;
-      let height = size.height as f64;
+      let (width, height) = (size.width as f64, size.height as f64);
 
+      // Create WhatsApp webview
       let wv1 = window.add_child(
-        tauri::webview::WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
+        WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
           .initialization_script(&format!("window.label='WA';{}", js_wa))
           .auto_resize(),
@@ -205,8 +237,9 @@ fn main() {
       )?;
       wv1.set_zoom(0.75)?;
 
+      // Create Telegram webview
       let wv2 = window.add_child(
-        tauri::webview::WebviewBuilder::new("TG", WebviewUrl::External("https://web.telegram.org/k/".parse().unwrap()))
+        WebviewBuilder::new("TG", WebviewUrl::External("https://web.telegram.org/k/".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
           .initialization_script(&format!("window.label='TG';{}", js_tg))
           .auto_resize(),
@@ -218,66 +251,11 @@ fn main() {
       let state = app.state::<AppState>();
       *state.webview_wa.lock().unwrap() = Some(wv1);
       *state.webview_tg.lock().unwrap() = Some(wv2);
+      *state.state_index.lock().unwrap() = 2;
 
-      *app.state::<AppState>().state_index.lock().unwrap() = 2;
       switch_view(&app.handle());
-
       Ok(())
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
-
-fn update_tray_icon(app: &AppHandle, count: u8) {
-  let icon_index = count.min(10);
-  let state = app.state::<AppState>();
-  let tray_lock = state.tray.lock().unwrap();
-  if let Some(tray) = tray_lock.as_ref() {
-    let image = &state.tray_icons[icon_index as usize];
-    let _ = tray.set_icon(Some(image.clone()));
-  }
-}
-
-fn switch_view(app: &AppHandle) {
-  let state = app.state::<AppState>();
-  let mut idx = state.state_index.lock().unwrap();
-  let wv1_guard = state.webview_wa.lock().unwrap();
-  let wv1 = wv1_guard.as_ref().unwrap();
-  let wv2_guard = state.webview_tg.lock().unwrap();
-  let wv2 = wv2_guard.as_ref().unwrap();
-  let w = app.get_window("main").unwrap();
-  let size = w.inner_size().unwrap();
-  let (width, height) = (size.width as f64, size.height as f64);
-
-  match *idx {
-    0 => { // 0→1 TG
-      w.show().unwrap();
-      w.set_skip_taskbar(false).unwrap();
-      w.set_focus().unwrap();
-      w.set_always_on_top(true).unwrap();
-      w.set_always_on_top(false).unwrap();
-      wv1.set_position(LogicalPosition::new(width, 0.)).unwrap();
-      wv1.set_size(PhysicalSize::new(0, height as u32)).unwrap();
-      wv2.set_position(LogicalPosition::new(0., 0.)).unwrap();
-      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
-    }
-    1 => { // 1→2 Hide
-      w.hide().unwrap();
-      w.set_skip_taskbar(true).unwrap();
-    }
-    _ => { // 2→0 WA
-      w.show().unwrap();
-      w.set_skip_taskbar(false).unwrap();
-      w.set_focus().unwrap();
-      w.set_always_on_top(true).unwrap();
-      w.set_always_on_top(false).unwrap();
-      wv1.set_position(LogicalPosition::new(0., 0.)).unwrap();
-      wv1.set_size(PhysicalSize::new(width, height)).unwrap();
-      wv2.set_position(LogicalPosition::new(width, 0.)).unwrap();
-      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
-    }
-  }
-
-  *idx = (*idx + 1) % 3;
-}
-
