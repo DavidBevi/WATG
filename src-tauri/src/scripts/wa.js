@@ -1,3 +1,7 @@
+//,-------------------------------------------------------------------------------------,
+//| wa.js - injected in WhatsApp Web webview to enable some features                    |
+//'-------------------------------------------------------------------------------------'
+
 function debugAndSend() {
   const parentElement = document.querySelector('#pane-side');
   if (!parentElement) { console.error('Parent element #pane-side not found.'); return; }
@@ -117,3 +121,28 @@ ready(() => {
     setInterval(injectEscButton, 1000);
   }, 3000);
 });
+
+
+// Open URLs in default browser
+document.addEventListener('click', (event) => {
+    // Check if the clicked element is an anchor tag or is inside one
+    const anchor = event.target.closest('a');
+    if (anchor && anchor.href) {
+        // Prevent default, invoke opener installed in main.rs
+        event.preventDefault(); window.__TAURI__.opener.openUrl(anchor.href);
+    }
+});
+
+// Enable notification permission
+if (Notification.permission!=="granted") { Object.defineProperty(window.Notification,'permission',{get:()=>"granted"}); }
+
+// Only injected on Windows to reroute new Notification(...) calls
+;(function () {
+  const _Native = window.Notification;
+  window.Notification = function (title, opts) {window.__TAURI__.invoke('notify', {title, body: opts?.body ?? ''});
+    // still fire the in‐page Notification to keep any page‐side logic happy
+    return new _Native(title, opts);};
+  window.Notification.requestPermission = _Native.requestPermission.bind(_Native);
+  Object.defineProperty(window.Notification, 'permission', {get() { return 'granted'; }});})();
+
+  
