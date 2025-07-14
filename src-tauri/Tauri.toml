@@ -17,8 +17,7 @@ capabilities = [ "default", "window-state" ]
 
 [plugins.pluginReportTitle]
 invoke = true
-
-[plugins.window-state]
+window-state = ""
 
 [bundle]
 active = true
