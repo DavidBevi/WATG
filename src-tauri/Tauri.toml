@@ -13,29 +13,31 @@ withGlobalTauri = true
 
 [app.security]
 csp = "default-src 'self'; connect-src ipc: http://ipc.localhost"
+capabilities = [ "default", "window-state" ]
 
-[plugins]
-pluginReportTitle = { invoke = true }
-window-state = null
+[plugins.pluginReportTitle]
+invoke = true
+
+[plugins.window-state]
 
 [bundle]
 active = true
 targets = "all"
+icon = [
+  "src/icons/icon-watg.png",
+  "src/icons/icon-watg.ico",
+  "src/icons/tray-0.png",
+  "src/icons/tray-1.png",
+  "src/icons/tray-2.png",
+  "src/icons/tray-3.png",
+  "src/icons/tray-4.png",
+  "src/icons/tray-5.png",
+  "src/icons/tray-6.png",
+  "src/icons/tray-7.png",
+  "src/icons/tray-8.png",
+  "src/icons/tray-9.png",
+  "src/icons/tray-10.png",
+]
 
 [bundle.windows.webviewInstallMode]
 type = "downloadBootstrapper"
-
-[bundle.icon]
-0 = "src/icons/icon-watg.png"
-1 = "src/icons/icon-watg.ico"
-2 = "src/icons/tray-0.png"
-3 = "src/icons/tray-1.png"
-4 = "src/icons/tray-2.png"
-5 = "src/icons/tray-3.png"
-6 = "src/icons/tray-4.png"
-7 = "src/icons/tray-5.png"
-8 = "src/icons/tray-6.png"
-9 = "src/icons/tray-7.png"
-10 = "src/icons/tray-8.png"
-11 = "src/icons/tray-9.png"
-12 = "src/icons/tray-10.png"
