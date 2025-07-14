@@ -23,19 +23,21 @@ C= needed by Cargo   |   T= needed by Tauri   |   W= code/res of WATG
 -----------------------------------------------------------------------
 📁src-tauri/                  
 ├ 📁.cargo/                
-│ └ config.toml            C    Enables CRT static linking
+│ └ config.toml            C    Removes a dependency on Windows
 ├ 📁capabilities/
+│ ├ default.json           T    Permissions for some WATG features
 │ └ window-state.json      T    Permissions for window-state plugin
 ├ 📁src/                     
 │ ├ 📁icons/                
-│ │ └ icon-watg.ico        W    Icon for the Titlebar and Taskbar
-│ │ └ tray-{0..10}.png     W    Icons for bundle and tray
+│ │ ├ icon-watg.ico        W    Icon for the Titlebar and Taskbar
+│ │ └ tray-{0..10}.png     W    Icons for app/bundle and tray
 │ ├ 📁scripts/              
 │ │ ├ wa.js                W    JS badge logic + UI mods for WhatsApp
 │ │ └ tg.js                W    JS badge logic for Telegram
-│ └ main.rs                W    Main Rust source for WATG
+│ ├ main.rs                W    Main Rust source for WATG
+│ └ for_windows.rs         W    Windows-only styff (tray, toasts...)
 ├ Cargo.toml               C    Crates, dependencies, plugins, features
-└ tauri.conf.json          T    Defines app/bundle
+└ Tauri.toml               T    App/bundle settings
 ```
 
 <br/>
