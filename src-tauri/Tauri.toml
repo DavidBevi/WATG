@@ -1,0 +1,41 @@
+#,-------------------------------------------------------------------------------------,
+#| Tauri.toml - other app features                                                     |
+#| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+#| 1. Cargo reads Cargo.toml and calls Tauri                                           |
+#| 2. Tauri reads Tauri.toml                                                           |
+#'-------------------------------------------------------------------------------------'
+
+# productName & version          ✅ INHERITED FROM CARGO
+identifier = "davidbevi.watg"  # ❌ CANT INHERIT THIS FROM CARGO
+
+[app]
+withGlobalTauri = true
+
+[app.security]
+csp = "default-src 'self'; connect-src ipc: http://ipc.localhost"
+
+[plugins]
+pluginReportTitle = { invoke = true }
+window-state = null
+
+[bundle]
+active = true
+targets = "all"
+
+[bundle.windows.webviewInstallMode]
+type = "downloadBootstrapper"
+
+[bundle.icon]
+0 = "src/icons/icon-watg.png"
+1 = "src/icons/icon-watg.ico"
+2 = "src/icons/tray-0.png"
+3 = "src/icons/tray-1.png"
+4 = "src/icons/tray-2.png"
+5 = "src/icons/tray-3.png"
+6 = "src/icons/tray-4.png"
+7 = "src/icons/tray-5.png"
+8 = "src/icons/tray-6.png"
+9 = "src/icons/tray-7.png"
+10 = "src/icons/tray-8.png"
+11 = "src/icons/tray-9.png"
+12 = "src/icons/tray-10.png"
