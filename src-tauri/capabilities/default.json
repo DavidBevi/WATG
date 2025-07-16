@@ -1,8 +1,9 @@
 {
+  "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": ["*"],
-  "remote": {"urls": ["https://*","http://*"]},
+  "remote": {"urls": ["https://*","http://*","ipc://*", "tauri://*"]},
   "permissions": [
     "core:default",
     "core:webview:allow-set-webview-zoom",
