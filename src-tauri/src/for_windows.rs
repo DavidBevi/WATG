@@ -53,7 +53,7 @@ pub fn create_tray_icon(app: &AppHandle<Wry>, menu: &Menu<Wry>) -> tauri::Result
         "switch" => crate::switch_view(app),
         "fix_toast_titles" => {
           match toast_cache_cleanup() {
-            Ok(_) => show_dialog(&format!("𝐖𝐢𝐧𝐝𝐨𝐰𝐬 𝐏𝐮𝐬𝐡 𝐍𝐨𝐭𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧 𝐝𝐚𝐭𝐚𝐛𝐚𝐬𝐞 cleaned, WATG notifications should now load the correct title (contact or group name).\n\nIf this doesn't happen try rebooting, and if it still fails please report it as a bug."), "info"),
+            Ok(_) => show_dialog(&format!("𝐖𝐢𝐧𝐝𝐨𝐰𝐬 𝐏𝐮𝐬𝐡 𝐍𝐨𝐭𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧 𝐝𝐚𝐭𝐚𝐛𝐚𝐬𝐞 cleaned, WATG notifications should now load the correct title (contact or group name).\n\nIf this doesn't happen try rebooting, and if it still fails please report it as a bug (use button in the tray-icon menu)."), "info"),
             Err(err) => show_dialog(&format!("Toast DB error: {}", err), "error"),
           }
         }
