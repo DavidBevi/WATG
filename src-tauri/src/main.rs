@@ -3,7 +3,11 @@
 //| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 //| This file contains all cross-platform logic and delegates                           |
 //| platform-specific code to for_[platform].rs                                         |
-//'-------------------------------------------------------------------------------------
+//'-------------------------------------------------------------------------------------'
+
+// Disable terminal window on Windows ---------------------------------------------------
+#![cfg_attr(target_os="windows", windows_subsystem="windows")] 
+// DO NOT DELETE ------------------------------------------------------------------------
 
 // Import core features, for every platform ---------------------------------------------
 use std::{fs::File, io::Write, sync::Mutex};
