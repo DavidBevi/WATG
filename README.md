@@ -9,11 +9,8 @@
 - ✅ Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]<br/>
 - ✅ Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/tray-preview.png" height="13px"> and taskbar / titlebar (text)
 
-![toast](https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/toast-example.png)
-
 ### ❌ But WATG is still in beta because:
-- ❌ Theming is not implemented yet
-- ❌ Probably other important stuff that I didn't think about yet
+- ❌ My testing was very limited and I don't know if WATG is stable and functional. [Any feedback is very welcome!](https://github.com/DavidBevi/WATG/issues/new)
 
 ### ⚠️ You also should know:
 - ⚠️ Whatsapp doesn't provide a "narrow-layout", so I had to make [a mod](https://github.com/DavidBevi/violentmonkey-scripts/blob/main/whatsapp-web-responsive.js) to enable a good experience even when the WATG window is narrow. I can't find a way to hide one pesky thin vertical line, and some elements of the UI are not yet modded, so you'll have to cope with it or mod my mod and then rebuild WATG.
@@ -21,7 +18,9 @@
 
 <br/>
 
-### 😁 [Any feedback is very welcome!](https://github.com/DavidBevi/WATG/issues/new)
+<p align="center">
+  <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/toast-example.png">
+</p>
 
 <br/>
 <br/>
