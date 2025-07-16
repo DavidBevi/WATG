@@ -136,13 +136,16 @@ document.addEventListener('click', (event) => {
 // Enable notification permission
 if (Notification.permission!=="granted") { Object.defineProperty(window.Notification,'permission',{get:()=>"granted"}); }
 
-// Only injected on Windows to reroute new Notification(...) calls
+// Send notifications to Rust
 ;(function () {
   const _Native = window.Notification;
-  window.Notification = function (title, opts) {window.__TAURI__.invoke('notify', {title, body: opts?.body ?? ''});
-    // still fire the in‐page Notification to keep any page‐side logic happy
-    return new _Native(title, opts);};
+window.Notification = function (title, opts) {
+    console.log('→ window.Notification invoked:', title, opts?.body);
+    window.__TAURI__.event.emit('tauri://message', {_watg: true, title, body: opts?.body ?? '' });
+    return new _Native(title, opts);
+  };
   window.Notification.requestPermission = _Native.requestPermission.bind(_Native);
-  Object.defineProperty(window.Notification, 'permission', {get() { return 'granted'; }});})();
+  Object.defineProperty(window.Notification, 'permission', {get() { return 'granted'; }});
+})();
 
-  
+

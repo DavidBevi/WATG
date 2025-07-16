@@ -3,16 +3,13 @@
 //| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
 //| This file contains all cross-platform logic and delegates                           |
 //| platform-specific code to for_[platform].rs                                         |
-//'-------------------------------------------------------------------------------------'
+//'-------------------------------------------------------------------------------------
 
 // Import core features, for every platform ---------------------------------------------
 use std::{fs::File, io::Write, sync::Mutex};
 use tauri::{
   AppHandle, Manager, LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
-  tray::{TrayIcon},  // TrayIconEvent, MouseButton, MouseButtonState},
-  menu::{Menu, MenuItem},
-  image::Image,
-  webview::{Webview, WebviewBuilder},
+  image::Image, webview::{Webview, WebviewBuilder}, tray::TrayIcon, Listener
 };
 use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 
@@ -23,10 +20,6 @@ use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 #[cfg(target_os="linux")] use for_linux as platform;
 #[cfg(target_os="macos")] mod for_macos;
 #[cfg(target_os="macos")] use for_macos as platform;
-
-// Disable terminal window on Windows ---------------------------------------------------
-#![cfg_attr(target_os="windows", windows_subsystem="windows")] 
-// OFF for debug, DO NOT DELETE ---------------------------------------------------------
 
 // Shared application state, accessible from commands and UI events ---------------------
 struct AppState {
@@ -56,7 +49,7 @@ fn setup_error_hook() {
     let _ = File::create("watg-error.log").and_then(|mut f| f.write_all(log.as_bytes()));
 
     #[cfg(target_os = "windows")]
-    platform::show_error_dialog(msg);
+    platform::show_dialog(msg, "error");
   }));
 }
 
@@ -84,7 +77,7 @@ fn report_title(app: AppHandle, title: String, label: String) {
     let mut badge_wa = state.badge_wa.lock().unwrap();
     let mut badge_tg = state.badge_tg.lock().unwrap();
     if label == "WA" { *badge_wa = count; } else { *badge_tg = count; }
-    update_tray_icon(&app, badge_wa.saturating_add(*badge_tg));
+    platform::update_tray_icon(&app, badge_wa.saturating_add(*badge_tg));
   }
 }
 
@@ -99,29 +92,18 @@ fn report_badges(app: AppHandle, count: String, label: String) {
     *state.badge_tg.lock().unwrap() = n;
   }
   let total = state.badge_wa.lock().unwrap().saturating_add(*state.badge_tg.lock().unwrap());
-  update_tray_icon(&app, total);
+  platform::update_tray_icon(&app, total);
 }
 
 // Called from JS to send a native system notification ----------------------------------
 #[tauri::command]
 fn notify(title: String, body: String) {
-  println!("🔥 main.rs → notify(): title='{}' body='{}'", title, body);
+  print!("✉️  {} on TG: ", title);
   platform::send_notification(&title, &body);
 }
 
-// Updates the tray icon image based on the badge count (delegates to platform) ---------
-fn update_tray_icon(app: &AppHandle, count: u8) {
-  let icon_index = count.min(10);
-  let state = app.state::<AppState>();
-  let tray = state.tray.lock().unwrap();
-  if let Some(tray) = tray.as_ref() {
-    let image = state.tray_icons[icon_index as usize].clone();
-    platform::set_tray_icon(tray, image);
-  }
-}
-
 // Switches between: WA view, TG view, and hidden state ---------------------------------
-fn switch_view(app: &AppHandle) {
+pub fn switch_view(app: &AppHandle) {
   let state = app.state::<AppState>();
   let mut idx = state.state_index.lock().unwrap();
   let wv1 = state.webview_wa.lock().unwrap().as_ref().unwrap().clone();
@@ -169,26 +151,7 @@ fn main() {
   let js_wa = include_str!("scripts/wa.js").to_string();
   let js_tg = include_str!("scripts/tg.js").to_string();
 
-  // Load tray icons for badge counts 0..10
-  let mut icons = Vec::with_capacity(11);
-  for i in 0..=10 {
-    let bytes: &[u8] = match i {
-      0 => include_bytes!("icons/tray-0.png"),
-      1 => include_bytes!("icons/tray-1.png"),
-      2 => include_bytes!("icons/tray-2.png"),
-      3 => include_bytes!("icons/tray-3.png"),
-      4 => include_bytes!("icons/tray-4.png"),
-      5 => include_bytes!("icons/tray-5.png"),
-      6 => include_bytes!("icons/tray-6.png"),
-      7 => include_bytes!("icons/tray-7.png"),
-      8 => include_bytes!("icons/tray-8.png"),
-      9 => include_bytes!("icons/tray-9.png"),
-      10 => include_bytes!("icons/tray-10.png"),
-      _ => unreachable!(),
-    };
-    let image = Image::from_bytes(bytes).expect("Failed to create image");
-    icons.push(image);
-  }
+  let icons = platform::load_tray_icons();
 
   tauri::Builder::default()
     .plugin(tauri_plugin_window_state::Builder::default().build())
@@ -206,8 +169,7 @@ fn main() {
     })
     .invoke_handler(tauri::generate_handler![report_title, report_badges, notify])
     .setup(move |app| {
-      let switch_i = MenuItem::with_id(app, "switch", "Switch", true, None::<&str>)?;
-      let menu = Menu::with_items(app, &[&switch_i])?;
+      let menu = platform::build_tray_menu(&app.handle());
       let tray = platform::create_tray_icon(&app.handle(), &menu)?;
       app.state::<AppState>().tray.lock().unwrap().replace(tray);
 
@@ -226,7 +188,6 @@ fn main() {
       let size = window.inner_size().unwrap();
       let (width, height) = (size.width as f64, size.height as f64);
 
-      // Create WhatsApp webview
       let wv1 = window.add_child(
         WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
@@ -237,7 +198,21 @@ fn main() {
       )?;
       wv1.set_zoom(0.75)?;
 
-      // Create Telegram webview
+      wv1.listen("tauri://message", move |event| {
+        let payload = event.payload();
+        if let Ok(value) = serde_json::from_str::<serde_json::Value>(payload) {
+          if value.get("_watg") == Some(&serde_json::Value::Bool(true)) {
+            if let (Some(title), Some(body)) = (
+              value.get("title").and_then(|v| v.as_str()),
+              value.get("body").and_then(|v| v.as_str()),
+            ) {
+              print!("✉️  {} on WA: ", title);
+              platform::send_notification(title, body);
+            }
+          }
+        }
+      });
+
       let wv2 = window.add_child(
         WebviewBuilder::new("TG", WebviewUrl::External("https://web.telegram.org/k/".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
