@@ -1,3 +1,10 @@
+#,-------------------------------------------------------------------------------------,
+#| config.toml - used to remove a dependency (windows)                                 |
+#| - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - |
+#| This file is the only place where you can tell Cargo to use CRT static linking,     |
+#| to remove dependency on VC runtime                                                  |
+#'-------------------------------------------------------------------------------------'
+
 [build]
 target = "x86_64-pc-windows-msvc"
 
