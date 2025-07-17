@@ -13,7 +13,8 @@
 use std::{fs::File, io::Write, sync::Mutex};
 use tauri::{
   AppHandle, Manager, LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
-  image::Image, webview::{Webview, WebviewBuilder}, tray::TrayIcon, Listener
+  image::Image, webview::{Webview, WebviewBuilder}, tray::TrayIcon, Listener,
+  window::{EffectsBuilder, Effect} // for Windows
 };
 use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 
@@ -233,6 +234,10 @@ fn main() {
       *state.state_index.lock().unwrap() = 2;
 
       switch_view(&app.handle());
+
+      // Set MicaDark theme - Calling it immediately after the creation of window kept failing, here it works.
+      #[cfg(target_os="windows")] window.set_effects(EffectsBuilder::new().effect(Effect::MicaDark).build())?;
+      
       Ok(())
     })
     .run(tauri::generate_context!())
