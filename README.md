@@ -4,9 +4,9 @@
 </p>
 
 ### ✅ WATG combines WhatsApp Web & Telegram Web in a super-light app, with:
-- ✅ Native window with reactive UI<br/>
-- ✅ Native notifications (WPN)<br/>
-- ✅ Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]<br/>
+- ✅ Native window with reactive UI
+- ✅ Windows Push Notifications (see below)
+- ✅ Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]
 - ✅ Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/demo-pics/tray-all.png" height="13px"> and taskbar / titlebar (text)
 
 ### ❌ But WATG is still in beta because:
