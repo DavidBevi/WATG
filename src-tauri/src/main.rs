@@ -6,7 +6,7 @@
 //'-------------------------------------------------------------------------------------'
 
 // Disable terminal window on Windows ---------------------------------------------------
-#![cfg_attr(target_os="windows", windows_subsystem="windows")] 
+// #![cfg_attr(target_os="windows", windows_subsystem="windows")] 
 // DO NOT DELETE ------------------------------------------------------------------------
 
 // Import core features, for every platform ---------------------------------------------
