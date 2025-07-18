@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/watg-title.png" width="330pt" align="center">
-  <div align="center"><a href="https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.8.1-Beta.exe?raw=true"><b>v0.8.1-Beta</b></a> - for Windows 10/11</div>
+  <div align="center"><a href="https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.8.2-Beta.exe?raw=true"><b>v0.8.2-Beta</b></a> - for Windows 10/11</div>
 </p>
 
 ### ✅ WATG combines WhatsApp Web & Telegram Web in a super-light app, with:
