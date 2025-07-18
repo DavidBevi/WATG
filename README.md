@@ -7,7 +7,7 @@
 - ✅ Native window with reactive UI<br/>
 - ✅ Native notifications (WPN)<br/>
 - ✅ Switch view between `WA` / `TG` / `Hidden` [*Click on tray icon*]<br/>
-- ✅ Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/icons/tray-preview.png" height="13px"> and taskbar / titlebar (text)
+- ✅ Unread count in tray icon <img src="https://github.com/DavidBevi/WATG/blob/main/demo-pics/tray-all.png" height="13px"> and taskbar / titlebar (text)
 
 ### ❌ But WATG is still in beta because:
 - ❌ My testing was very limited and I don't know if WATG is stable and functional. [Any feedback is very welcome!](https://github.com/DavidBevi/WATG/issues/new)
