@@ -7,7 +7,7 @@
 
 // Imports
 use tauri::{Wry, AppHandle, tray::{TrayIcon, TrayIconBuilder, TrayIconEvent, MouseButton,
-    MouseButtonState}, menu::{Menu, MenuItem}, image::Image, Manager};
+    MouseButtonState}, menu::{Menu, MenuItem}, image::Image, Manager, Emitter};
 use windows_sys::Win32::UI::WindowsAndMessaging::{MessageBoxW, MB_ICONERROR, MB_ICONINFORMATION, MB_OK};
 use std::{io::Write, ffi::OsStr, iter::once, os::windows::ffi::OsStrExt, 
     process::Command, os::windows::process::CommandExt};
@@ -16,6 +16,7 @@ use winrt_toast::{Toast, ToastManager, register};
 use std::path::PathBuf;
 use os_info::get;
 use urlencoding::encode;
+use tauri::menu::Submenu;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION"); 
 
@@ -33,6 +34,30 @@ pub fn show_dialog(message: &str, dialog_type: &str) {
   }
 }
 
+// Create tray menu with all options ----------------------------------------------------
+pub fn build_tray_menu(app: &AppHandle<Wry>) -> Menu<Wry> {
+  let info_i = MenuItem::with_id(app, "info", "ℹ️  Info page on Github", true, None::<&str>).unwrap();
+  let report_i = MenuItem::with_id(app, "report_bug", "🪲  Report a bug on Github", true, None::<&str>).unwrap();
+  let about_i = Submenu::with_items(app, format!("🗨️  𝐖𝐀𝐓𝐆 {}", VERSION), true, &[&info_i, &report_i]).unwrap();
+
+  let wa_i = MenuItem::with_id(app, "wa", "Show WhatsApp", true, None::<&str>).unwrap();
+  let tg_i = MenuItem::with_id(app, "tg", "Show Telegram", true, None::<&str>).unwrap();
+  let hide_i = MenuItem::with_id(app, "hide", "Hide (in tray)", true, None::<&str>).unwrap();
+  let switch_i = Submenu::with_items(app, "🔃  Switch view", true, &[&wa_i, &tg_i, &hide_i]).unwrap();
+
+  let toast_i = MenuItem::with_id(app, "test_toast", "🔔  Receive a test notification", true, None::<&str>).unwrap();
+  let fix_i = MenuItem::with_id(app, "fix_toast_titles", "🔕  Toast-cache clean-up", true, None::<&str>).unwrap();
+  let dev_wa_i = MenuItem::with_id(app, "dev_wa", "🔧  Open WA DevTools", true, None::<&str>).unwrap();
+  let dev_tg_i = MenuItem::with_id(app, "dev_tg", "🔧  Open TG DevTools", true, None::<&str>).unwrap();
+  let tools_i = Submenu::with_items(app, "🔧  Tools", true, &[&toast_i, &fix_i, &dev_wa_i, &dev_tg_i]).unwrap();
+
+
+  let relaunch_i = MenuItem::with_id(app, "relaunch", "💥  Reload (for theme)", true, None::<&str>).unwrap();
+  let quit_i = MenuItem::with_id(app, "quit", "❌  Quit WATG", true, None::<&str>).unwrap();
+
+  Menu::with_items(app, &[&about_i, &switch_i, &tools_i, &relaunch_i, &quit_i]).unwrap()
+}
+
 // Create tray icon and attach click + menu event handlers ------------------------------
 pub fn create_tray_icon(app: &AppHandle<Wry>, menu: &Menu<Wry>) -> tauri::Result<TrayIcon> {
   TrayIconBuilder::new()
@@ -44,20 +69,29 @@ pub fn create_tray_icon(app: &AppHandle<Wry>, menu: &Menu<Wry>) -> tauri::Result
         button_state: MouseButtonState::Up,
         ..
       } = event {
-        crate::switch_view(&app.app_handle());
+        crate::switch_view(&app.app_handle(), None);
       }
     })
     .on_menu_event(|app, event| {
       match event.id.0.as_str() {
         "info" => {let _ = tauri_plugin_opener::open_url("https://github.com/DavidBevi/WATG", None::<&str>);}
-        "switch" => crate::switch_view(app),
         "fix_toast_titles" => {
           match toast_cache_cleanup() {
             Ok(_) => show_dialog(&format!("𝐖𝐢𝐧𝐝𝐨𝐰𝐬 𝐏𝐮𝐬𝐡 𝐍𝐨𝐭𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧 𝐝𝐚𝐭𝐚𝐛𝐚𝐬𝐞 cleaned, WATG notifications should now load the correct title (contact or group name).\n\nIf this doesn't happen try rebooting, and if it still fails please report it as a bug (use button in the tray-icon menu)."), "info"),
-            Err(err) => show_dialog(&format!("Toast DB error: {}", err), "error"),
+            Err(err) => show_dialog(&format!("Error cleaning the WPN database: {}\n\nCheck WATG's Github page for possible fixes or to open a bug report.", err), "error"),
           }
         }
+        "wa" => crate::switch_view(app, Some(2)),
+        "tg" => crate::switch_view(app, Some(0)),
+        "hide" => crate::switch_view(app, Some(1)),
+        "test_toast" => send_notification("David Bevi", "Hello,\nthis is a test notification.\n\nI hope you're enjoying WATG! 😁"),
         "report_bug" => {let _ = tauri_plugin_opener::open_url(format!("https://github.com/DavidBevi/WATG/issues/new?body=WATG+{}+on+{}%0ADescription:+", VERSION, encode(&get().to_string())), None::<&str>);}
+        
+        "dev_wa" => {let _ = app.emit("open-devtools", "WA");}
+        "dev_tg" => {let _ = app.emit("open-devtools", "TG");}
+        
+        "relaunch" => {std::process::Command::new(std::env::current_exe().unwrap()).spawn().unwrap();
+                       std::process::exit(0);}
         "quit" => std::process::exit(0),
         _ => {}
       }
@@ -179,15 +213,4 @@ fn toast_cache_cleanup() -> Result<usize, String> {
   ).map_err(|e| e.to_string())?;
 
   Ok(count)
-}
-
-// Create tray menu with all options ----------------------------------------------------
-pub fn build_tray_menu(app: &AppHandle<Wry>) -> Menu<Wry> {
-  let info_i = MenuItem::with_id(app, "info", format!("ℹ️  𝐖𝐀𝐓𝐆 {} (about)", VERSION), true, None::<&str>).unwrap();
-  let switch_i = MenuItem::with_id(app, "switch", "🔃  Switch view", true, None::<&str>).unwrap();
-  let fix_i = MenuItem::with_id(app, "fix_toast_titles", "🗑️  Toast-cache clean-up", true, None::<&str>).unwrap();
-  let report_i = MenuItem::with_id(app, "report_bug", "🪲  Report a bug", true, None::<&str>).unwrap();
-  let quit_i = MenuItem::with_id(app, "quit", "❌  Quit WATG", true, None::<&str>).unwrap();
-
-  Menu::with_items(app, &[&info_i, &switch_i, &fix_i, &report_i, &quit_i]).unwrap()
 }
