@@ -14,7 +14,7 @@ use std::{fs::File, io::Write, sync::Mutex};
 use tauri::{
   AppHandle, Manager, LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
   image::Image, webview::{Webview, WebviewBuilder}, tray::TrayIcon, Listener,
-  window::{EffectsBuilder, Effect} // for windows
+  window::{EffectsBuilder, Effect} // for windows-theme
 };
 use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 
@@ -42,17 +42,11 @@ struct AppState {
 // Called on panic: logs to file and shows an error dialog (only on Windows) ------------
 fn setup_error_hook() {
   std::panic::set_hook(Box::new(|info| {
-    let msg = if let Some(s) = info.payload().downcast_ref::<&str>() {
-      *s
-    } else if let Some(s) = info.payload().downcast_ref::<String>() {
-      s.as_str()
-    } else {
-      "Unknown panic"
-    };
-
+    let msg = if let Some(s) = info.payload().downcast_ref::<&str>() {*s}
+         else if let Some(s) = info.payload().downcast_ref::<String>() {s.as_str()}
+         else {"Unknown panic"};
     let log = format!("Panic: {}\n", msg);
     let _ = File::create("watg-error.log").and_then(|mut f| f.write_all(log.as_bytes()));
-
     #[cfg(target_os = "windows")]
     platform::show_dialog(msg, "error");
   }));
@@ -70,8 +64,7 @@ fn report_title(app: AppHandle, title: String, label: String) {
   if let Some(w) = app.get_window("main") {
     let wa = state.title_wa.lock().unwrap();
     let tg = state.title_tg.lock().unwrap();
-    let full = format!(
-      "WATG {} {}",
+    let full = format!( "WATG {} {}",
       if wa.is_empty() { "" } else { &*wa },
       if tg.is_empty() { "" } else { &*tg }
     );
@@ -86,20 +79,6 @@ fn report_title(app: AppHandle, title: String, label: String) {
   }
 }
 
-// Called from JS to update only the badge count ----------------------------------------
-#[tauri::command]
-fn report_badges(app: AppHandle, count: String, label: String) {
-  let n = count.parse::<u8>().unwrap_or(0);
-  let state = app.state::<AppState>();
-  if label == "WA" {
-    *state.badge_wa.lock().unwrap() = n;
-  } else {
-    *state.badge_tg.lock().unwrap() = n;
-  }
-  let total = state.badge_wa.lock().unwrap().saturating_add(*state.badge_tg.lock().unwrap());
-  platform::update_tray_icon(&app, total);
-}
-
 // Called from JS to send a native system notification ----------------------------------
 #[tauri::command]
 fn notify(title: String, body: String) {
@@ -108,7 +87,7 @@ fn notify(title: String, body: String) {
 }
 
 // Switches between: WA view, TG view, and hidden state ---------------------------------
-pub fn switch_view(app: &AppHandle) {
+pub fn switch_view(app: &AppHandle, target: Option<u8>) {
   let state = app.state::<AppState>();
   let mut idx = state.state_index.lock().unwrap();
   let wv1 = state.webview_wa.lock().unwrap().as_ref().unwrap().clone();
@@ -117,7 +96,9 @@ pub fn switch_view(app: &AppHandle) {
   let size = w.inner_size().unwrap();
   let (width, height) = (size.width as f64, size.height as f64);
 
-  match *idx {
+  let new_idx = target.unwrap_or_else(|| (*idx + 1) % 3);
+
+  match new_idx {
     0 => { // Show TG
       w.show().unwrap();
       w.set_skip_taskbar(false).unwrap();
@@ -146,15 +127,13 @@ pub fn switch_view(app: &AppHandle) {
     }
   }
 
-  *idx = (*idx + 1) % 3;
+  *idx = new_idx;
 }
 
 // Main ---------------------------------------------------------------------------------
 fn main() {
   setup_error_hook();
-
-  let js_wa = include_str!("scripts/wa.js").to_string();
-  let js_tg = include_str!("scripts/tg.js").to_string();
+  println!("Running from: {:?}", std::env::current_exe());  // debug
 
   let icons = platform::load_tray_icons();
 
@@ -172,7 +151,7 @@ fn main() {
       badge_tg: Mutex::new(0),
       tray_icons: icons,
     })
-    .invoke_handler(tauri::generate_handler![report_title, report_badges, notify])
+    .invoke_handler(tauri::generate_handler![report_title, notify])
     .setup(move |app| {
       let menu = platform::build_tray_menu(&app.handle());
       let tray = platform::create_tray_icon(&app.handle(), &menu)?;
@@ -196,8 +175,12 @@ fn main() {
       let wv1 = window.add_child(
         WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
-          .initialization_script(&format!("window.label='WA';{}", js_wa))
-          .auto_resize(),
+          .auto_resize()
+          .initialization_script(&format!(r#"{internal}{external}"#,
+            internal = include_str!("scripts/wa.js"),
+            external = std::env::current_exe().ok()
+              .and_then(|p| std::fs::read_to_string(p.with_file_name("wa.js")).ok()).unwrap_or_default()
+          )),
         LogicalPosition::new(0., 0.),
         LogicalSize::new(width, height),
       )?;
@@ -221,22 +204,38 @@ fn main() {
       let wv2 = window.add_child(
         WebviewBuilder::new("TG", WebviewUrl::External("https://web.telegram.org/k/".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
-          .initialization_script(&format!("window.label='TG';{}", js_tg))
-          .auto_resize(),
+          .auto_resize()
+          .initialization_script(&format!(r#"{internal}{external}"#,
+            internal = include_str!("scripts/tg.js"),
+            external = std::env::current_exe().ok()
+              .and_then(|p| std::fs::read_to_string(p.with_file_name("tg.js")).ok()).unwrap_or_default()
+          )),
         LogicalPosition::new(width, 0.),
         LogicalSize::new(width, height),
       )?;
       wv2.set_zoom(0.75)?;
+
+      let wv1_handle = wv1.clone();
+      let wv2_handle = wv2.clone();
 
       let state = app.state::<AppState>();
       *state.webview_wa.lock().unwrap() = Some(wv1);
       *state.webview_tg.lock().unwrap() = Some(wv2);
       *state.state_index.lock().unwrap() = 2;
 
-      switch_view(&app.handle());
+      switch_view(&app.handle(), None);
 
       // Set MicaDark theme - Calling it immediately after the creation of window kept failing, here it works.
       #[cfg(target_os="windows")] window.set_effects(EffectsBuilder::new().effect(Effect::MicaDark).build())?;
+
+      if let Some(w) = app.get_window("main") {
+        w.listen("open-devtools", move |event| {
+          let payload: String = event.payload().to_string();
+          if payload=="\"WA\"" {let _ = wv1_handle.open_devtools();}
+          else if payload=="\"TG\"" {let _ = wv2_handle.open_devtools();}
+          else {println!("⚙️  [main.rs] received open-devtools request for {:?}", event.payload())};
+        });
+      }
 
       Ok(())
     })
