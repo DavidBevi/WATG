@@ -1,25 +1,38 @@
 //,-------------------------------------------------------------------------------------,
-//| wa.js - injected in WhatsApp Web webview to enable some features                    |
+//| wa.js - use this file to define:                                                    |
+//| - UNREAD-COUNTER method & parameters                                                |
+//| - STYLE mods to enable narrow-layout                                                |
+//| - CORE integration with Tauri backend (must be last)                                |
 //'-------------------------------------------------------------------------------------'
 
-function debugAndSend() {
-  const parentElement = document.querySelector('#pane-side');
-  if (!parentElement) { console.error('Parent element #pane-side not found.'); return; }
-  const spans = Array.from(parentElement.querySelectorAll('span'));
-  const unreadBadges = spans.filter(el => {
-    const style = window.getComputedStyle(el);
-    const bg = style.backgroundColor;
-    const name = (el.getAttribute('aria-label') || el.getAttribute('name') || '').toLowerCase().trim();
-    return (bg === 'rgb(0, 168, 132)' || bg === 'rgb(37, 211, 102)') &&
-           (name === 'da leggere' || name.includes('non lett') ||
-            name === 'unread' || name.includes('unread'));
-  });
-  const count = unreadBadges.length <= 0 ? '_' : unreadBadges.length;
-  window.__TAURI__.core.invoke('report_title', { title: count.toString(), label: window.label });
+
+// ==UNREAD-COUNTER== ===================================================================
+// 🔔 Get unread count, pass to Tauri
+// 🕒 Called every 0.5s
+// ⚠️ Fragile: Whatsapp will eventually change so much that this breaks
+function countUnreadMex() {
+  const pane = document.querySelector('#pane-side');
+  if (!pane) {
+    countUnreadMex.i = (countUnreadMex.i || 0) + 1;
+    sendUnreadCountToWatg(['⏳','⌛'][countUnreadMex.i % 2]);
+    return;
+  }
+  let count = 0;
+  for (const el of pane.querySelectorAll('span')) {
+    const bg = window.getComputedStyle(el).backgroundColor;
+    if (bg==='rgb(0, 168, 132)' || bg==='rgb(33, 192, 99)') {count++;}
+  }
+  sendUnreadCountToWatg(count>0? String(count): '_');
 }
 
-function injectCSS() {
-  const style = document.createElement('style');
+
+// ==STYLE== ============================================================================
+// 🎨 CSS-mod to enable narrow-layout
+// 🕒 Called ONCE, after WA loads
+// ⚠️ Fragile: Whatsapp will eventually change so much that this breaks
+function injectCustomCss() {
+  if (document.getElementById('watg-css')) return;
+  const style = document.createElement('style'); style.id = 'watg-css';
   style.innerHTML = `@media (max-width: 747px) {
 /*𝐂𝐎𝐍𝐓𝐀𝐈𝐍𝐄𝐑*/
     #app>div>div>div:has(header) {
@@ -75,77 +88,81 @@ function injectCSS() {
 /*𝐂𝐇𝐀𝐓-𝐓𝐀𝐁𝐋𝐈𝐒𝐓*/ #side>div[role="tablist"] {visibility:hidden;height:0px;padding:0px;}`;
   document.head.appendChild(style);
 }
-
+// 🎨 CSS+JS-mod to add ESC button in narrow-layout
+// 🕒 Called every 0.5s
+// ⚠️ Fragile: Whatsapp will eventually change so much that this breaks
 function injectEscButton() {
   if (window.innerWidth >= 748) return;
-
   const target = document.querySelector('#app>div>div>div>div>div>header');
   if (target && !target.querySelector('.esc-button')) {
     const btn = document.createElement('button');
-
     const nativeBtn = document.querySelector('button[aria-label="Menu"], button[aria-label="Cerca…"]');
     btn.className = (nativeBtn ? nativeBtn.className : '') + ' esc-button';
-
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('viewBox', '0 0 56 56');
     svg.setAttribute('height', '24');
     svg.setAttribute('width', '24');
     svg.setAttribute('fill', 'currentColor');
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', 'M48 23H15Q12 23 14 21L23 12Q25 10 23 8L23 8Q21 6 19 8L4 24Q2 26 4 28L19 44Q21 46 23 44L23 44Q25 42 23 40L14 31Q12 29 15 29H48Q50 29 50 27V25Q50 23 48 23Z');
     svg.appendChild(path);
     btn.appendChild(svg);
-
-    btn.onclick = () => {
-      document.dispatchEvent(new KeyboardEvent('keydown', {
-        key: 'Escape', keyCode: 27, which: 27, bubbles: true
-      }));
-    };
-
+    btn.onclick=()=>{document.dispatchEvent(new KeyboardEvent('keydown', {
+        key:'Escape', keyCode:27, which:27, bubbles:true}));};
     target.insertBefore(btn, target.firstChild);
   }
 }
 
-function ready(fn) {
-  if (document.readyState !== 'loading') { fn(); }
-  else { document.addEventListener('DOMContentLoaded', fn); }
+
+// ==CORE== KEEP LAST ===================================================================
+// ⚙️ This defines the method to pass the unread count to WATG
+// 🕒 Called: by other functions
+// 💪 Robust: Whatsapp changes can't break this
+function sendUnreadCountToWatg(count) {
+  window.__TAURI__.core.invoke('report_title', { title: count.toString(), label: "WA" });
 }
-
-ready(() => {
-  injectCSS();
-  setTimeout(() => {
-    debugAndSend();
-    setInterval(debugAndSend, 500);
-    setInterval(injectEscButton, 1000);
-  }, 3000);
-});
-
-
-// Open URLs in default browser
-document.addEventListener('click', (event) => {
-    // Check if the clicked element is an anchor tag or is inside one
-    const anchor = event.target.closest('a');
-    if (anchor && anchor.href) {
-        // Prevent default, invoke opener installed in main.rs
-        event.preventDefault(); window.__TAURI__.opener.openUrl(anchor.href);
-    }
-});
-
-// Enable notification permission
-if (Notification.permission!=="granted") { Object.defineProperty(window.Notification,'permission',{get:()=>"granted"}); }
-
-// Send notifications to Rust
-;(function () {
-  const _Native = window.Notification;
-window.Notification = function (title, opts) {
+// ⚙️ Force-enable notification-permission, reroute notifications via Rust
+// 🕒 Called: once, when loading 
+// 💪 Robust: Whatsapp changes can't break this
+(function () {
+  Object.defineProperty(window.Notification, 'permission', {get() {return 'granted';},});
+  const Native = window.Notification;
+  window.Notification = function (title, opts) {
     console.log('→ window.Notification invoked:', title, opts?.body);
-    window.__TAURI__.event.emit('tauri://message', {_watg: true, title, body: opts?.body ?? '' });
-    return new _Native(title, opts);
+    window.__TAURI__.event.emit('tauri://message', {_watg: true, title, body: opts?.body ?? '',});
+    return new Native(title, opts);
   };
-  window.Notification.requestPermission = _Native.requestPermission.bind(_Native);
-  Object.defineProperty(window.Notification, 'permission', {get() { return 'granted'; }});
+  window.Notification.requestPermission = Native.requestPermission.bind(Native);
+  // ⚙️ Intercept notifications dispatched from service workers to the main thread
+  // 🕒 Called: whenever Notification is constructed
+  // 💪 Robust: logs stack trace to trace the source
+  try {
+    const originalShow = Native.prototype.show;
+    Native.prototype.show = function () {
+      console.log('→ Native Notification.prototype.show called:', this.title);
+      return originalShow.apply(this, arguments);
+    };
+  } catch (e) {
+    console.warn('Notification.prototype.show interception failed:', e);
+  }
 })();
-
-
+// ⚙️ Add listener to reroute link-opening in default browser
+// 🕒 Called: once, when loading 
+// 💪 Robust: Whatsapp changes can't break this
+(function () {
+  document.addEventListener('click', (event) => {const anchor = event.target.closest('a');
+    if (anchor?.href) {event.preventDefault();window.__TAURI__.opener.openUrl(anchor.href);}});
+})();
+// ⚙️ injectCustomCss (once), start polling for countUnreadMex + injectEscButton (every 0.5s)
+// 🕒 Called: once, when loading 
+// 💪 Robust: Whatsapp changes can't break this
+(function () {
+  document.addEventListener('DOMContentLoaded', () => {
+    try { setInterval(() => countUnreadMex?.(), 500); } catch(e) { console.warn('countUnreadMex failed: ', e); }
+    try { injectCustomCss?.(); } catch(e) { console.warn('injectCustomCss failed: ', e); }
+    setTimeout(() => {
+      try { setInterval(() => injectEscButton?.(), 500); } catch(e) { console.warn('injectEscButton failed: ', e); }
+    }, 3000);
+  });
+})();
