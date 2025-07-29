@@ -1,28 +1,86 @@
 //,-------------------------------------------------------------------------------------,
 //| wa.js - use this file to define:                                                    |
-//| - UNREAD-COUNTER method & parameters                                                |
+//| - UNREAD-COUNTER methods & parameters                                               |
+//| - NOTIFICATION methods & parameters                                                 |
 //| - STYLE mods to enable narrow-layout                                                |
 //| - CORE integration with Tauri backend (must be last)                                |
 //'-------------------------------------------------------------------------------------'
 
 
 // ==UNREAD-COUNTER== ===================================================================
-// 🔔 Get unread count, pass to Tauri
-// 🕒 Called every 0.5s
-// ⚠️ Fragile: Whatsapp will eventually change so much that this breaks
-function countUnreadMex() {
+// 🔔 Counts unread-badges, passes number to Tauri, returns list of badges (html elements)
+// 🕒 Called every 0.5s (by extractNotif())
+// ⚠️ Fragile: relies on exact color of unread-badges
+function countUnreadMsg() {
   const pane = document.querySelector('#pane-side');
   if (!pane) {
-    countUnreadMex.i = (countUnreadMex.i || 0) + 1;
-    sendUnreadCountToWatg(['⏳','⌛'][countUnreadMex.i % 2]);
-    return;
+    countUnreadMsg.i = (countUnreadMsg.i || 0) + 1;
+    sendUnreadCountToWatg(['⏳', '⌛'][countUnreadMsg.i % 2]);
+    return [];
   }
-  let count = 0;
+  let count = 0;  const result = [];
   for (const el of pane.querySelectorAll('span')) {
     const bg = window.getComputedStyle(el).backgroundColor;
-    if (bg==='rgb(0, 168, 132)' || bg==='rgb(33, 192, 99)') {count++;}
+    if (bg==='rgb(0, 168, 132)' || bg==='rgb(33, 192, 99)') {count++;result.push(el);}
   }
-  sendUnreadCountToWatg(count>0? String(count): '_');
+  sendUnreadCountToWatg(count > 0 ? String(count) : '_');
+  return result; 
+}
+
+// ==NOTIFICATIONS== ====================================================================
+// 🔔 Fetches msg-info from neighbor elements of unread-badges, builds+sends notifications
+// 🕒 Called every 0.5s
+// ⚠️ Fragile: relies on exact hierarchy of badges and other html-elements
+function extractNotif(mode) {
+  const badges = countUnreadMsg();
+  const results = [];
+  extractNotif.last = extractNotif.last ?? ["[WATG]","Empty notif history"];
+
+  for (let i = 0; i < badges.length; i++) {
+    const badge = badges[i];
+
+    // rootT = root of TITLE = 5th-ancestor
+    // rootM = root of MEX   = 4th-ancestor
+    let rootT = badge.parentElement?.parentElement?.parentElement?.parentElement?.parentElement?.children[0];
+    let rootM = badge.parentElement?.parentElement?.parentElement?.parentElement;
+
+    // from rootT, select appropriate child (different between group-chat and normal-chat)
+    let isGroup   = rootT?.children[0]?.children[0];
+    let chatTitle = isGroup?.getAttribute("title") || 
+                    rootT?.children[0]?.children[0]?.children[0]?.children[0]?.getAttribute("title");
+
+    // from rootM, extract msg and eventual symbol
+    var chatMsg   = rootM?.children[0]?.children[0]?.getAttribute("title");
+    var chatInfo  = rootM?.children[0]?.children[0]?.children[0]?.children[0]?.children[0]?.textContent;
+
+    // if there's a symbol before the msg: convert to emoji
+    switch (chatInfo) {
+      case undefined: case "":  chatInfo = ""; break;
+      case "status-check":      chatInfo = "→"; break;
+      case "status-dblcheck":   chatInfo = "→"; break;
+      case "status-ptt":        chatInfo = "🎙️"; break;
+      case "status-image":      chatInfo = "📷"; break;
+      case "status-sticker":    chatInfo = "📃"; break;
+      case "status-vcard":      chatInfo = "👤"; break;
+      default:                  chatInfo = `${chatInfo}:`;
+    }
+
+    chatMsg = `${chatInfo??""} ${chatMsg}`.trim()
+    let notif = [chatTitle, chatMsg];
+    results.push(notif);
+
+    if (i==0) {
+      if ((mode==null || mode=="sendIfNew") && (extractNotif.last[0]!=chatTitle || extractNotif.last[1]!=chatMsg)) {
+          extractNotif.last = notif;
+          new Notification(extractNotif.last[0], {body: extractNotif.last[1]});
+      } else if (mode=="sendCached") {
+          new Notification(extractNotif.last[0], {body: extractNotif.last[1]});
+      } else if (mode=="log") {    
+          console.log(`'${chatTitle}': '${chatMsg}'`);
+          if (extractNotif.last!=notif) {extractNotif.last=notif;}
+      }
+    }
+  }
 }
 
 
@@ -115,6 +173,70 @@ function injectEscButton() {
 }
 
 
+// ==HELP== (work in progress)===========================================================
+// This section contains helper-functions to help maintain WATG, because Whatsapp changes
+//   will eventually break "normal" functions
+function help() {
+  console.group("help() → prints useful commands");
+  console.info("ℹ️ The design and limitations of Whatsapp guarantee that WATG functions will break. Use these functions to troubleshoot.");
+
+  console.group("inquireElements(attribute, ancestor, [childrenNumbers])");
+  console.info("inquireElements() takes the output of countUnreadMsg(), which should be a list of the unread-badges html-elements.",
+    "\n\nExamples: inquireElements('tag') → prints element-type(s) of the badges",
+    "\n          inquireElements('class', 1) → prints class(es) of the badges' parents",
+    "\n          inquireElements('title', 3, [2,1]) → prints titles of 1st-sons of 2nd-sons of 3rd-lvl-ancestors of the badges",
+    "\n\nA quick way to troubleshoot is to run these:",
+    "\n   - inquireElements('title', 4, [1,1])       → should print messages with unread badge",
+    "\n   - inquireElements('title', 5, [1,1,1])     → should print groups with unread badge",
+    "\n   - inquireElements('title', 5, [1,1,1,1,1]) → should print 1-on-1-chats with unread badge" 
+  ); console.groupEnd();
+  console.groupEnd();
+}
+// DEBUG-HELPER
+function inquireElements(p1, p2, p3) {
+  const matchingSpans = countUnreadMsg(true);
+  if (!matchingSpans) {
+    inquireElements.i = (inquireElements.i || 0) + 1;
+    return;
+  }
+
+  if (p1 === 'selectors') {for (const el of matchingSpans) {console.log(getUniqueSelector(el));} return;}
+
+  for (const original of matchingSpans) {
+    let el = original;
+    // Climb up to the ancestor
+    let level = parseInt(p2, 10) || 0;
+    while (level-- > 0 && el) {el = el.parentElement;}
+    if (!el) continue;
+    // Descend into children (1-based indexing)
+    if (Array.isArray(p3)) {
+      for (const idx1 of p3) {
+        const idx0 = idx1 - 1;
+        if (!el || !el.children || el.children.length<=idx0 || idx0<0) {el=null; break;}
+        el = el.children[idx0];
+      }
+    }
+    if (!el) continue;
+    if (!p1 || p1 === 'tag' || p1 === 'tagName') {console.log(el.tagName.toLowerCase());}
+    else {console.log(el.getAttribute(p1));}
+  }
+}
+// Returns a full DevTools-like CSS selector for a given element
+function getUniqueSelector(el) {
+  const path = [];
+  while (el && el.nodeType === Node.ELEMENT_NODE) {
+    let selector = el.nodeName.toLowerCase();
+    if (el.id) {selector+= '#'+el.id; path.unshift(selector); break;}
+    else {let sib=el, nth=1;
+      while (sib=sib.previousElementSibling) {if (sib.nodeName.toLowerCase()===el.nodeName.toLowerCase()) nth++;}
+      selector += `:nth-child(${nth})`;
+    }
+    path.unshift(selector); el = el.parentElement;
+  }
+  return path.join('> ');
+}
+
+
 // ==CORE== KEEP LAST ===================================================================
 // ⚙️ This defines the method to pass the unread count to WATG
 // 🕒 Called: by other functions
@@ -154,12 +276,13 @@ function sendUnreadCountToWatg(count) {
   document.addEventListener('click', (event) => {const anchor = event.target.closest('a');
     if (anchor?.href) {event.preventDefault();window.__TAURI__.opener.openUrl(anchor.href);}});
 })();
-// ⚙️ injectCustomCss (once), start polling for countUnreadMex + injectEscButton (every 0.5s)
+// ⚙️ injectCustomCss (once), start polling for inquireElements + injectEscButton (every 0.5s)
 // 🕒 Called: once, when loading 
 // 💪 Robust: Whatsapp changes can't break this
 (function () {
   document.addEventListener('DOMContentLoaded', () => {
-    try { setInterval(() => countUnreadMex?.(), 500); } catch(e) { console.warn('countUnreadMex failed: ', e); }
+    help(); 
+    try { setInterval(() => extractNotif?.(), 500); } catch(e) { console.warn('extractNotif failed: ', e); }
     try { injectCustomCss?.(); } catch(e) { console.warn('injectCustomCss failed: ', e); }
     setTimeout(() => {
       try { setInterval(() => injectEscButton?.(), 500); } catch(e) { console.warn('injectEscButton failed: ', e); }
