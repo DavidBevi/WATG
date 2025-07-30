@@ -12,7 +12,7 @@
 ### ❌ But WATG is still in beta because:
 - ❌ My testing was very limited and I don't know if WATG is stable and functional. [Any feedback is very welcome!](https://github.com/DavidBevi/WATG/issues/new)
 
-### ℹ️ You also should know:
+### ⚠️ You also should know:
 Whatsapp is a _bitch_: it doesn't have a "narrow-layout", it doesn't expose the notifications, and WATG has to workaround these issues with JS injection. Changes in Whatsapp code _will_ eventually break WATG, so I'm packing it with:
 - ⚙️ **DevTools**, accessible (in tray menu) to inspect HTML/CSS/JS and troubleshoot.<br/>&nbsp; → _Help is available with command `help()` in Whatsapp's JS console_
 - 🎨 **Custom mods**, via side-load: ➊ download [**wa.js**](https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/scripts/wa.js), ➋ edit as needed, ➌ keep it in the same folder of WATG.exe.<br/>&nbsp; → _Mods are loaded when WATG loads itself, restart it to apply changes_
