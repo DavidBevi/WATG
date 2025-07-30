@@ -3,6 +3,7 @@
 //| - UNREAD-COUNTER methods & parameters                                               |
 //| - NOTIFICATION methods & parameters                                                 |
 //| - STYLE mods to enable narrow-layout                                                |
+//| - DEBUG-TOOLS                                                                       |
 //| - CORE integration with Tauri backend (must be last)                                |
 //'-------------------------------------------------------------------------------------'
 
@@ -28,16 +29,22 @@ function countUnreadMsg() {
 }
 
 // ==NOTIFICATIONS== ====================================================================
-// 🔔 Fetches msg-info from neighbor elements of unread-badges, builds+sends notifications
+// 🔔 Fetches msg-info from unread-badge-spans' relatives, builds+sends notifications
 // 🕒 Called every 0.5s
 // ⚠️ Fragile: relies on exact hierarchy of badges and other html-elements
 function extractNotif(mode) {
   const badges = countUnreadMsg();
   const results = [];
-  extractNotif.last = extractNotif.last ?? ["[WATG]","Empty notif history"];
+  extractNotif.cache  = extractNotif.cache  ?? new Map(); // title → {msg, count}
+  extractNotif.symbol = extractNotif.symbol ?? new Map([["status-check", "✔"],["status-dblcheck", "✔✔"],
+    ["status-ptt", "🎙️"],["status-image", "📷"],["status-sticker", "📃"],["status-vcard", "👤"]]);
 
   for (let i = 0; i < badges.length; i++) {
     const badge = badges[i];
+
+    // "aria-label" contains alt text of badges
+    let badgeCount = parseInt(badge.getAttribute("aria-label")?.replace(/\D+/g, '')) || 0;
+    if (badgeCount===0 && mode!=="log") continue;
 
     // rootT = root of TITLE = 5th-ancestor
     // rootM = root of MEX   = 4th-ancestor
@@ -54,31 +61,24 @@ function extractNotif(mode) {
     var chatInfo  = rootM?.children[0]?.children[0]?.children[0]?.children[0]?.children[0]?.textContent;
 
     // if there's a symbol before the msg: convert to emoji
-    switch (chatInfo) {
-      case undefined: case "":  chatInfo = ""; break;
-      case "status-check":      chatInfo = "→"; break;
-      case "status-dblcheck":   chatInfo = "→"; break;
-      case "status-ptt":        chatInfo = "🎙️"; break;
-      case "status-image":      chatInfo = "📷"; break;
-      case "status-sticker":    chatInfo = "📃"; break;
-      case "status-vcard":      chatInfo = "👤"; break;
-      default:                  chatInfo = `${chatInfo}:`;
-    }
-
-    chatMsg = `${chatInfo??""} ${chatMsg}`.trim()
+    chatInfo = extractNotif.symbol.get(chatInfo) ?? (chatInfo ? `${chatInfo}:` : "");
+    chatMsg = `${chatInfo??""} ${chatMsg}`.trim();
     let notif = [chatTitle, chatMsg];
     results.push(notif);
 
-    if (i==0) {
-      if ((mode==null || mode=="sendIfNew") && (extractNotif.last[0]!=chatTitle || extractNotif.last[1]!=chatMsg)) {
-          extractNotif.last = notif;
-          new Notification(extractNotif.last[0], {body: extractNotif.last[1]});
-      } else if (mode=="sendCached") {
-          new Notification(extractNotif.last[0], {body: extractNotif.last[1]});
-      } else if (mode=="log") {    
-          console.log(`'${chatTitle}': '${chatMsg}'`);
-          if (extractNotif.last!=notif) {extractNotif.last=notif;}
+    // log
+    if (mode==="log") {console.log(`(${badgeCount}) '${chatTitle}': '${chatMsg}'`);}
+
+    let cached = extractNotif.cache.get(chatTitle);
+    let isNew  = !cached || cached.msg !== chatMsg || cached.count < badgeCount;
+
+    if (isNew) {
+      extractNotif.cache.set(chatTitle, {msg: chatMsg, count: badgeCount});
+      if (mode == null || mode === "sendIfNew") {
+        new Notification(chatTitle, {body: chatMsg});
       }
+    } else if (i === 0 && mode === "sendCached") {
+      new Notification(chatTitle, {body: chatMsg});
     }
   }
 }
@@ -173,23 +173,33 @@ function injectEscButton() {
 }
 
 
-// ==HELP== (work in progress)===========================================================
+// ==DEBUG-TOOLS== ======================================================================
 // This section contains helper-functions to help maintain WATG, because Whatsapp changes
 //   will eventually break "normal" functions
 function help() {
-  console.group("help() → prints useful commands");
-  console.info("ℹ️ The design and limitations of Whatsapp guarantee that WATG functions will break. Use these functions to troubleshoot.");
+  console.group("help() → Changes in Whatsapp code can break WATG functionality, use these functions to troubleshoot");
+
+  console.group("extractNotif(mode)");
+  console.info("extractNotif() looks for specific siblings of each numbered-badge to extract Title+Body and send notifications.",
+    "\n\nExamples: extractNotif()             → IF there's a new or increased numbered-badge → toast",
+    "\n          extractNotif('sendCached') → IF there's at least 1 cached numbered-badge → toast",
+    "\n          extractNotif('log')        → prints Title + LastMessage for each chat with a numbered-badge",
+    "\n\n❓  This function takes the output of countUnreadMsg(), which can become bad: use 𝐢𝐧𝐪𝐮𝐢𝐫𝐞𝐄𝐥𝐞𝐦𝐞𝐧𝐭𝐬() ↓ to troubleshoot."
+  ); console.groupEnd();
 
   console.group("inquireElements(attribute, ancestor, [childrenNumbers])");
-  console.info("inquireElements() takes the output of countUnreadMsg(), which should be a list of the unread-badges html-elements.",
-    "\n\nExamples: inquireElements('tag') → prints element-type(s) of the badges",
-    "\n          inquireElements('class', 1) → prints class(es) of the badges' parents",
+  console.info("inquireElements() is made to analyze the output of countUnreadMsg(), which should be a list of the unread-badges html-elements.",
+    "\n    Use this function to check those elements and their relatives, to extract the unread-count and Title+Body for notifications.",
+    "\n\nExamples: inquireElements('selectors')       → prints the selectors of the badges (their path in the HTML-hierarchy)",
+    "\n          inquireElements('tag')             → prints element-type(s) of the badges",
+    "\n          inquireElements('class', 1)        → prints class(es) of the badges' parents",
     "\n          inquireElements('title', 3, [2,1]) → prints titles of 1st-sons of 2nd-sons of 3rd-lvl-ancestors of the badges",
     "\n\nA quick way to troubleshoot is to run these:",
-    "\n   - inquireElements('title', 4, [1,1])       → should print messages with unread badge",
-    "\n   - inquireElements('title', 5, [1,1,1])     → should print groups with unread badge",
-    "\n   - inquireElements('title', 5, [1,1,1,1,1]) → should print 1-on-1-chats with unread badge" 
+    "\n  - inquireElements('title', 4, [1,1])       → should print messages with unread-badge",
+    "\n  - inquireElements('title', 5, [1,1,1])     → should print groups with unread-badge",
+    "\n  - inquireElements('title', 5, [1,1,1,1,1]) → should print 1-on-1-chats with unread-badge" 
   ); console.groupEnd();
+
   console.groupEnd();
 }
 // DEBUG-HELPER
@@ -276,7 +286,7 @@ function sendUnreadCountToWatg(count) {
   document.addEventListener('click', (event) => {const anchor = event.target.closest('a');
     if (anchor?.href) {event.preventDefault();window.__TAURI__.opener.openUrl(anchor.href);}});
 })();
-// ⚙️ injectCustomCss (once), start polling for inquireElements + injectEscButton (every 0.5s)
+// ⚙️ injectCustomCss (once), start polling for extractNotif + injectEscButton (every 0.5s)
 // 🕒 Called: once, when loading 
 // 💪 Robust: Whatsapp changes can't break this
 (function () {
