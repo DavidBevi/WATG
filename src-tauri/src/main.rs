@@ -14,7 +14,7 @@ use std::{fs::File, io::Write, sync::Mutex};
 use tauri::{
   AppHandle, Manager, LogicalPosition, LogicalSize, PhysicalSize, WebviewUrl,
   image::Image, webview::{Webview, WebviewBuilder}, tray::TrayIcon, Listener,
-  window::{EffectsBuilder, Effect} // for windows-theme
+  window::{EffectsBuilder, Effect, Color}
 };
 use tauri_plugin_window_state::{AppHandleExt, StateFlags, WindowExt};
 
@@ -56,7 +56,7 @@ fn setup_error_hook() {
 #[tauri::command]
 fn report_title(app: AppHandle, title: String, label: String) {
   let state = app.state::<AppState>();
-  {
+   {
     let mut wa = state.title_wa.lock().unwrap();
     let mut tg = state.title_tg.lock().unwrap();
     if label == "WA" { *wa = title.clone(); } else { *tg = title.clone(); }
@@ -64,13 +64,10 @@ fn report_title(app: AppHandle, title: String, label: String) {
   if let Some(w) = app.get_window("main") {
     let wa = state.title_wa.lock().unwrap();
     let tg = state.title_tg.lock().unwrap();
-    let full = format!( "WATG {} {}",
-      if wa.is_empty() { "" } else { &*wa },
-      if tg.is_empty() { "" } else { &*tg }
-    );
+    let full = format!("WATG {} {}", if wa.is_empty() {""} else {&*wa}, if tg.is_empty() {""} else {&*tg});
     let _ = w.set_title(&full);
   }
-  let count = if title == "_" { 0 } else { title.parse::<u8>().unwrap_or(0) };
+  let count = if title == "_" {0} else {title.parse::<u8>().unwrap_or(0)};
   {
     let mut badge_wa = state.badge_wa.lock().unwrap();
     let mut badge_tg = state.badge_tg.lock().unwrap();
@@ -88,43 +85,27 @@ fn notify(title: String, body: String) {
 
 // Switches between: WA view, TG view, and hidden state ---------------------------------
 pub fn switch_view(app: &AppHandle, target: Option<u8>) {
+  let w = app.get_window("main").unwrap();
   let state = app.state::<AppState>();
   let mut idx = state.state_index.lock().unwrap();
-  let wv1 = state.webview_wa.lock().unwrap().as_ref().unwrap().clone();
-  let wv2 = state.webview_tg.lock().unwrap().as_ref().unwrap().clone();
-  let w = app.get_window("main").unwrap();
-  let size = w.inner_size().unwrap();
-  let (width, height) = (size.width as f64, size.height as f64);
-
   let new_idx = target.unwrap_or_else(|| (*idx + 1) % 3);
 
-  match new_idx {
-    0 => { // Show TG
-      w.show().unwrap();
-      w.set_skip_taskbar(false).unwrap();
-      w.set_focus().unwrap();
-      w.set_always_on_top(true).unwrap();
-      w.set_always_on_top(false).unwrap();
-      wv1.set_position(LogicalPosition::new(width, 0.)).unwrap();
-      wv1.set_size(PhysicalSize::new(0, height as u32)).unwrap();
-      wv2.set_position(LogicalPosition::new(0., 0.)).unwrap();
-      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
-    }
-    1 => { // Hide window
+  if new_idx == 0 { // Hide
       w.hide().unwrap();
       w.set_skip_taskbar(true).unwrap();
-    }
-    _ => { // Show WA
+  } else { // Show
+      #[cfg(target_os="windows")] w.set_effects(EffectsBuilder::new().effect(Effect::MicaDark)
+        .build()).expect("Can't set theme");
       w.show().unwrap();
       w.set_skip_taskbar(false).unwrap();
       w.set_focus().unwrap();
       w.set_always_on_top(true).unwrap();
       w.set_always_on_top(false).unwrap();
-      wv1.set_position(LogicalPosition::new(0., 0.)).unwrap();
-      wv1.set_size(PhysicalSize::new(width, height)).unwrap();
-      wv2.set_position(LogicalPosition::new(width, 0.)).unwrap();
-      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
-    }
+      let width = w.inner_size().unwrap().width as f64;
+      state.webview_wa.lock().unwrap().as_ref().unwrap().clone()
+        .set_position(LogicalPosition::new((new_idx != 1) as u8 as f64 * width, 0.)).unwrap();
+      state.webview_tg.lock().unwrap().as_ref().unwrap().clone()
+        .set_position(LogicalPosition::new((new_idx == 1) as u8 as f64 * width, 0.)).unwrap();
   }
 
   *idx = new_idx;
@@ -160,6 +141,7 @@ fn main() {
       let window = tauri::window::WindowBuilder::new(app, "main").build()?;
       window.restore_state(StateFlags::all()).unwrap();
       window.set_title("WATG: --").unwrap();
+      window.set_background_color(Some(Color(50,50,50,1))).unwrap();
       {
         let app_handle = app.handle().clone();
         window.on_window_event(move |event| {
@@ -184,6 +166,7 @@ fn main() {
         LogicalPosition::new(0., 0.),
         LogicalSize::new(width, height),
       )?;
+      wv1.set_size(PhysicalSize::new(width, height)).unwrap();
       wv1.set_zoom(0.75)?;
 
       wv1.listen("tauri://message", move |event| {
@@ -213,6 +196,7 @@ fn main() {
         LogicalPosition::new(width, 0.),
         LogicalSize::new(width, height),
       )?;
+      wv2.set_size(PhysicalSize::new(width, height)).unwrap();
       wv2.set_zoom(0.75)?;
 
       let wv1_handle = wv1.clone();
@@ -223,10 +207,11 @@ fn main() {
       *state.webview_tg.lock().unwrap() = Some(wv2);
       *state.state_index.lock().unwrap() = 2;
 
-      switch_view(&app.handle(), None);
+      switch_view(&app.handle(), Some(1));
 
       // Set MicaDark theme - Calling it immediately after the creation of window kept failing, here it works.
-      #[cfg(target_os="windows")] window.set_effects(EffectsBuilder::new().effect(Effect::MicaDark).build())?;
+      #[cfg(target_os="windows")] window.set_effects(EffectsBuilder::new().effect(Effect::MicaDark)
+        .build()).expect("Can't set Mica dark theme");
 
       if let Some(w) = app.get_window("main") {
         w.listen("open-devtools", move |event| {
