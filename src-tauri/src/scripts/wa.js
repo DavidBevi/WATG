@@ -301,3 +301,4 @@ function sendUnreadCountToWatg(count) {
     }, 3000);
   });
 })();
+
