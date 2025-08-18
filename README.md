@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://github.com/DavidBevi/WATG/blob/main/demo-pics/watg-title.png" width="330pt" align="center">
-  <div align="center"><a href="https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.9.1-Beta.exe?raw=true"><b>v0.9.1-Beta</b></a> - for Windows 10/11</div>
+  <div align="center"><a href="https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.9.2-Beta.exe?raw=true"><b>v0.9.2-Beta</b></a> - for Windows 10/11</div>
 </p>
 
 <br/>
