@@ -92,6 +92,8 @@ function injectCustomCss() {
   if (document.getElementById('watg-css')) return;
   const style = document.createElement('style'); style.id = 'watg-css';
   style.innerHTML = `@media (max-width: 747px) {
+/*𝐌𝐀𝐈𝐍 + 𝐌𝐀𝐈𝐍>𝐃𝐈𝐕 cap width*/
+    #main, #main>div {max-width: 100vw !important; margin:0 !important; overflow-x:hidden;}
 /*𝐂𝐎𝐍𝐓𝐀𝐈𝐍𝐄𝐑*/
     #app>div>div>div:has(header) {
         display: flex! important;
@@ -112,16 +114,14 @@ function injectCustomCss() {
         border: 0 !important;
         overflow: hidden !important;
     }
-/*𝐋𝐈𝐒𝐓-𝐎𝐅-𝐂𝐇𝐀𝐓𝐒*/
+/*𝐋𝐈𝐒𝐓-𝐎𝐅-𝐂𝐇𝐀𝐓𝐒 needed to hide when narrow*/
     #app>div>div>div>div:has(header>div>div>h1){
         flex: 1 1 100% !important;
         max-width: none !important;
         min-width: 0 !important;
         overflow: hidden !important;
     }
-/*𝐂𝐇𝐀𝐓-𝐇𝐄𝐀𝐃𝐄𝐑 + 𝐂𝐇𝐀𝐓-𝐂𝐎𝐍𝐓𝐄𝐍𝐓 + 𝐂𝐇𝐀𝐓-𝐅𝐎𝐎𝐓𝐄𝐑*/
-    #app>div>div>div>div>div>header, #main>div>div>div>div, #main>footer {max-width: 100vw;}
-/*𝐂𝐇𝐀𝐓*/
+/*𝐂𝐇𝐀𝐓 needed to show and fit-container when narrow*/
     #app>div>div>div>div:has(div>header){
         flex: 0 0 100% !important;
         max-width: 100% !important;
@@ -143,6 +143,8 @@ function injectCustomCss() {
         padding-right: 16px !important;
     }
 }
+
+/*𝐎𝐏𝐓𝐈𝐎𝐍𝐀𝐋𝐒*/
 /*𝐂𝐇𝐀𝐓-𝐓𝐀𝐁𝐋𝐈𝐒𝐓*/ #side>div[role="tablist"] {visibility:hidden;height:0px;padding:0px;}`;
   document.head.appendChild(style);
 }
