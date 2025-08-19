@@ -92,6 +92,10 @@ function injectCustomCss() {
   if (document.getElementById('watg-css')) return;
   const style = document.createElement('style'); style.id = 'watg-css';
   style.innerHTML = `@media (max-width: 747px) {
+/*𝐏𝐎𝐏𝐔𝐏-𝐀𝐍𝐎𝐓𝐇𝐄𝐑-𝐈𝐍𝐒𝐓𝐀𝐍𝐂𝐄*/
+#app>div>div:nth-child(2)>div>div>div {place-self:start; width:100vw;}
+/*𝐁𝐎𝐑𝐃𝐄𝐑𝐄𝐃 remove border*/
+    #app>div>div>div>div>div:has(span) {border-left: 0 !important; max-width: 100vw !important;}
 /*𝐌𝐀𝐈𝐍 + 𝐌𝐀𝐈𝐍>𝐃𝐈𝐕 cap width*/
     #main, #main>div {max-width: 100vw !important; margin:0 !important; overflow-x:hidden;}
 /*𝐂𝐎𝐍𝐓𝐀𝐈𝐍𝐄𝐑*/
@@ -301,4 +305,3 @@ function sendUnreadCountToWatg(count) {
     }, 3000);
   });
 })();
-
