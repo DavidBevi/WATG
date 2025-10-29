@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://github.com/DavidBevi/WATG/blob/main/demo-pics/watg-title.png" width="330pt" align="center">
-  <div align="center"><a href="https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.9.4-Beta.exe?raw=true"><b>v0.9.4-Beta</b></a> - for Windows 10/11</div>
+  <div align="center"><a href="https://github.com/DavidBevi/WATG/blob/main/executables/WATG-0.9.5-Beta.exe?raw=true"><b>v0.9.5-Beta</b></a> - for Windows 10/11</div>
 </p>
 
 <br/>
@@ -21,7 +21,7 @@
 ### ⚠️ You also should know:
 Whatsapp is a _bitch_: it doesn't have a "narrow-layout", it doesn't expose notifications, and WATG has to workaround these issues with JS injection. Changes in Whatsapp code _will_ eventually break WATG, so I'm packing it with:
 - ⚙️ **DevTools**, accessible (in tray menu) to inspect HTML/CSS/JS and troubleshoot.<br/>&nbsp; → _Help is available with command `help()` in Whatsapp's JS console_
-- 🎨 **Custom mods**, via side-load: ➊ download [**wa.js**](https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/scripts/wa.js), ➋ edit as needed, ➌ keep it in the same folder of WATG.exe.<br/>&nbsp; → _Mods are loaded when WATG loads itself, restart it to apply changes_
+- 🎨 **Custom mods**, via side-load: ➊ download [**wa.css**](https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/scripts/wa.css) or [**wa.js**](https://github.com/DavidBevi/WATG/blob/main/src-tauri/src/scripts/wa.js), ➋ edit as needed, ➌ keep it in the same folder of WATG.exe.<br/>&nbsp; → _Mods are loaded when WATG loads itself, restart it to apply changes_
 
 <br/>
 
