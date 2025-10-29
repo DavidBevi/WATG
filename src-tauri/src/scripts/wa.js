@@ -104,8 +104,8 @@ function injectCustomCss() {
     overflow: hidden;
 }
 
-/* ℹ️ CHAT-LIST'S-TABs ✅ Hide to make space */
-div[role="tablist"] {
+/* ℹ️ CHAT-LIST'S TABLIST ✅ Hide to make space */
+#app>div>div>div>div>div>div>div[role="tablist"] {
     visibility: hidden;
     height: 0px;
     padding: 0px;
@@ -120,18 +120,50 @@ div[role="tablist"] {
 
 /* ℹ️ EMOJI-PANEL ✅ Fill (prevent overflow) */
 #expressions-panel-container>span>div {
-    left: 0px;
-    max-width: 100%;
+    left: 0px !important;
+    max-width: 100vw;
 }
 
-/* ℹ️ UNWANTED-BORDER ✅ Hide (applies to Div and his brother) */
+/* ℹ️ EMOJI-LIST ✅ Allow horizontal scroll */
+#expressions-panel-container>span>div>ul>div>div>div>div>div>div>div {
+    overflow-x: auto;
+}
+
+/* ℹ️ PANELS ✅ Set properties */
 #app>div>div>div>div>div>div:has(>div:only-child>span:only-child) {
-    border: none;
+    margin: 0;
+    border: 0;
+    flex: 0;
+}
+
+/* ℹ️ LEFT-PANEL when CHAT is CLOSED ✅ Expand */
+#app:not(:has(#main))>div>div>div>div>div>div:has(>div:only-child>span:only-child):first-child {
+    flex: 1;
+    min-width: 100vw;
+}
+
+/* ℹ️ RIGHT-PANEL when CHAT is OPEN  ✅ Expand */
+#app:has(#main)>div>div>div>div>div>div:has(>div:only-child>span:only-child):nth-child(2) {
+    flex: 1;
+    width: 100vw;
+}
+
+/* ℹ️ MAIN-HEADER when CHAT is OPEN ✅ Hide */
+#app:has(#main)>div>div>div>div>div>header>header {
+    visibility: hidden;
+}
+
+/* ℹ️ INFO-PANEL (1stline singles, 2ndline groups) ✅ Fix width */
+#app>div>div>div>div>div:has(span>div>span>div>div),
+#app>div>div>div>div>div:has(span>div>span>div[aria-label*="Info"]) {
+    width: calc(100vw - 10pt);
+    max-width: calc(100vw - 10pt);
+    left: 10pt;
 }
 
 /* ℹ️ CHAT-GRANDPARENT ✅ Prevent extra space with 'fit-content' */
 #app>div>div>div>div:has(div>#side) {
-    min-width: fit-content; 
+    min-width: fit-content;
     max-width: 100vw;
 }
 
@@ -148,21 +180,37 @@ div[role="tablist"] {
     visibility: visible;
 }
 
-/* ℹ️ CHAT-LIST (2 els) when CHAT-OPEN exists ✅ Hide (to show chat) */
-#app:has(#main)>div>div>div>div>div>header,
-#app:has(#main)>div>div>div>div>div>#side {
-    width: 0;
-    visibility: hidden;
-}
-
 /* ℹ️ CHAT-OPEN ✅ Already fills space, don't change */
 #app>div>div>div>div>div>#main {
 }
 
-/* ℹ️ INFO-PANEL ✅ Fix width (wider but capped) */
-#app>div>div>div>div>div:has(span>div>span>div>div) {
-    width: 350pt;
-    max-width: 85vw;
+/* ℹ️ USE-HERE ✅ Fix pos and width */
+#app>div>div>div:nth-child(2)>div>div>div {
+    position: absolute !important;
+    left: 0px !important;
+    max-width: 100vw;
+}
+
+/* ℹ️ SEND-FILE-PANEL (text field) ✅ Fix padding */
+#app>div>div>div>div>div>div>div>span>div>div>div>div>div>div>div>div:has(div>div[class*="input"]) {
+    margin: 0;
+}
+
+/* ℹ️ SEND-FILE-PANEL (file preview) ✅ Fix padding */
+#app>div>div>div>div>div>div>div>span>div>div>div>div>div>div>div>div:has(div>span[data-icon*="preview"]) {
+    padding: 20pt 0;
+    width: 100vw;
+}
+
+/* ℹ️ SEND-IMAGE-PANEL (text field) ✅ Fix padding */
+#app>div>div>div>div>div>div>div>span>div>div>div>div>div>div>div>div>div {
+    margin: 0 2pt;
+}
+
+/* ℹ️ SEND-IMAGE-TOOLBAR ✅ Make scrollable */
+#app>div>div>div>div>div>div>div>span>div>div>div>div>div>div>div {
+    overflow-x: scroll;
+    scrollbar-width: none;
 }
 
 } /* ⬆️⬆️⬆️ END WRAPPING ⬆️⬆️⬆️ */`;
@@ -323,3 +371,4 @@ function sendUnreadCountToWatg(count) {
     }, 3000);
   });
 })();
+
