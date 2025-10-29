@@ -154,18 +154,32 @@ fn main() {
       let size = window.inner_size().unwrap();
       let (width, height) = (size.width as f64, size.height as f64);
 
+      // --- BEGIN whatsapp webview with internal + external custom css ---
+      // Load internal JS (compiled in) and optional external wa.js located next to the exe
+      let wa_js_internal = include_str!("scripts/wa.js");
+      let wa_js_external = std::env::current_exe().ok()
+        .and_then(|p| std::fs::read_to_string(p.with_file_name("wa.js")).ok()).unwrap_or_default();
+
+      // Embed CSS at compile time and produce a JSON-escaped JS string literal.
+      // Also escape </script> sequence to avoid accidental script termination.
+      let wa_css_json = serde_json::to_string(include_str!("scripts/wa.css"))
+        .expect("Failed to JSON-escape wa.css")
+        .replace("</script>", "<\\/script>");
+
+      // Combine internal + external JS, then replace the token PLACEHOLDER with the JSON string literal.
+      let mut wa_combined = format!("{}{}", wa_js_internal, wa_js_external);
+      wa_combined = wa_combined.replace("PLACEHOLDER", &wa_css_json);
+
+      // Use the combined script directly as the initialization script
       let wv1 = window.add_child(
         WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
           .auto_resize()
-          .initialization_script(&format!(r#"{internal}{external}"#,
-            internal = include_str!("scripts/wa.js"),
-            external = std::env::current_exe().ok()
-              .and_then(|p| std::fs::read_to_string(p.with_file_name("wa.js")).ok()).unwrap_or_default()
-          )),
+          .initialization_script(&wa_combined),
         LogicalPosition::new(0., 0.),
         LogicalSize::new(width, height),
-      )?;
+      )?; // --- END whatsapp webview with internal + external custom css ---
+
       wv1.set_size(PhysicalSize::new(width, height)).unwrap();
       wv1.set_zoom(0.75)?;
 
