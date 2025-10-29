@@ -155,30 +155,40 @@ fn main() {
       let (width, height) = (size.width as f64, size.height as f64);
 
       // --- BEGIN whatsapp webview with internal + external custom css ---
-      // Load internal JS (compiled in) and optional external wa.js located next to the exe
+      // Load internal JS (compiled in) and attempt to read external wa.js next to the exe
       let wa_js_internal = include_str!("scripts/wa.js");
       let wa_js_external = std::env::current_exe().ok()
         .and_then(|p| std::fs::read_to_string(p.with_file_name("wa.js")).ok()).unwrap_or_default();
 
-      // Embed CSS at compile time and produce a JSON-escaped JS string literal.
-      // Also escape </script> sequence to avoid accidental script termination.
-      let wa_css_json = serde_json::to_string(include_str!("scripts/wa.css"))
-        .expect("Failed to JSON-escape wa.css")
+      // Read optional external wa.css next to the exe (empty string if missing)
+      let wa_css_external = std::env::current_exe().ok()
+        .and_then(|p| std::fs::read_to_string(p.with_file_name("wa.css")).ok()).unwrap_or_default();
+
+      // Combine internal CSS (compile-time) with external CSS (runtime) so external can override internal.
+      // Note: internal CSS comes first, external appended.
+      let combined_css = format!("{}\n{}", include_str!("scripts/wa.css"), wa_css_external);
+
+      // JSON-escape the combined CSS for safe injection and avoid accidental </script> termination.
+      let wa_css_json = serde_json::to_string(&combined_css)
+        .expect("Failed to JSON-escape combined wa.css")
         .replace("</script>", "<\\/script>");
 
-      // Combine internal + external JS, then replace the token PLACEHOLDER with the JSON string literal.
-      let mut wa_combined = format!("{}{}", wa_js_internal, wa_js_external);
-      wa_combined = wa_combined.replace("PLACEHOLDER", &wa_css_json);
+      // Choose which JS to use: external wa.js replaces internal if present.
+      // The chosen script must contain the token PLACEHOLDER (unquoted) where the CSS JSON should be inserted.
+      let mut wa_script = if wa_js_external.is_empty() {wa_js_internal.to_string()} else {wa_js_external};
 
-      // Use the combined script directly as the initialization script
+      // Replace the token PLACEHOLDER in the chosen script with the JSON string literal of the CSS.
+      wa_script = wa_script.replace("PLACEHOLDER", &wa_css_json);
+
+      // Use the final script as the initialization script for the WA webview.
       let wv1 = window.add_child(
         WebviewBuilder::new("WA", WebviewUrl::External("https://web.whatsapp.com".parse().unwrap()))
           .zoom_hotkeys_enabled(true)
           .auto_resize()
-          .initialization_script(&wa_combined),
+          .initialization_script(&wa_script),
         LogicalPosition::new(0., 0.),
         LogicalSize::new(width, height),
-      )?; // --- END whatsapp webview with internal + external custom css ---
+      )?;// --- END whatsapp webview with internal + external custom css ---
 
       wv1.set_size(PhysicalSize::new(width, height)).unwrap();
       wv1.set_zoom(0.75)?;
